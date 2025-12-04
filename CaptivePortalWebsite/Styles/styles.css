@@ -1,0 +1,26 @@
+body{
+    background-color: black;
+    margin: 0;
+}
+
+.Center{
+    margin: 0;
+    position: absolute;
+    left: 50%;
+    -ms-transform: translate(-50%);
+    transform: translate(-50%);
+    -webkit-transform: translate(-50%);
+    -moz-transform: translate(-50%);
+    -o-transform: translate(-50%);
+}
+
+header{
+    background-color: aliceblue;
+}
+
+.Menu{
+    display: flex;
+    justify-content: space-evenly;
+    width: inherit;
+    height: 93;
+}
