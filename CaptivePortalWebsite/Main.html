@@ -25,33 +25,37 @@
     <div class="container">
         <h1>Controller Configuration Manager</h1>
         <div class="controller-container">
-            <div class="controller">
-                <!-- Shoulder Buttons -->
-                <div class="shoulder-btn lt" onclick="openPopup('LT')">LT</div>
-                <div class="shoulder-btn rt" onclick="openPopup('RT')">RT</div>
-                <div class="shoulder-btn lb" onclick="openModal('LB')">LB</div>
-                <div class="shoulder-btn rb" onclick="openModal('RB')">RB</div>
+            <div class="controller-wrapper">
+                <div id="controller" class="controller">
+                    <div class="">
+                        <!-- Shoulder Buttons -->
+                        <div class="shoulder-btn lt" onclick="openPopup('LT')">LT</div>
+                        <div class="shoulder-btn rt" onclick="openPopup('RT')">RT</div>
+                        <div class="shoulder-btn lb" onclick="openModal('LB')">LB</div>
+                        <div class="shoulder-btn rb" onclick="openModal('RB')">RB</div>
 
-                <!-- D-Pad -->
-                <div class="dpad">
-                    <div class="dpad-btn dpad-up" onclick="openPopup('D-Pad Up')"></div>
-                    <div class="dpad-btn dpad-down" onclick="openPopup('D-Pad Down')"></div>
-                    <div class="dpad-btn dpad-left" onclick="openPopup('D-Pad Left')"></div>
-                    <div class="dpad-btn dpad-right" onclick="openPopup('D-Pad Right')"></div>
-                </div>
+                        <!-- D-Pad -->
+                        <div class="dpad">
+                            <div class="dpad-btn dpad-up" onclick="openPopup('D-Pad Up')"></div>
+                            <div class="dpad-btn dpad-down" onclick="openPopup('D-Pad Down')"></div>
+                            <div class="dpad-btn dpad-left" onclick="openPopup('D-Pad Left')"></div>
+                            <div class="dpad-btn dpad-right" onclick="openPopup('D-Pad Right')"></div>
+                        </div>
 
-                <!-- Face Buttons -->
-                <div class="face-buttons">
-                    <div class="face-btn btn-y" onclick="openPopup('Y Button')">Y</div>
-                    <div class="face-btn btn-b" onclick="openPopup('B Button')">B</div>
-                    <div class="face-btn btn-a" onclick="openPopup('A Button')">A</div>
-                    <div class="face-btn btn-x" onclick="openPopup('X Button')">X</div>
-                </div>
+                        <!-- Face Buttons -->
+                        <div class="face-buttons">
+                            <div class="face-btn btn-y" onclick="openPopup('Y Button')">Y</div>
+                            <div class="face-btn btn-b" onclick="openPopup('B Button')">B</div>
+                            <div class="face-btn btn-a" onclick="openPopup('A Button')">A</div>
+                            <div class="face-btn btn-x" onclick="openPopup('X Button')">X</div>
+                        </div>
 
-                <!-- Center Buttons -->
-                <div class="center-buttons">
-                    <div class="center-btn" onclick="openPopup('Select')"></div>
-                    <div class="center-btn" onclick="openPopup('Start')"></div>
+                        <!-- Center Buttons -->
+                        <div class="center-buttons">
+                            <div class="center-btn" onclick="openPopup('Select')"></div>
+                            <div class="center-btn" onclick="openPopup('Start')"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,9 +78,9 @@
         <div class="popup-content">
             <div class="popup-header" id="popupHeader">Console Configuration</div>
             <div class="popup-body">
-                <button class="popup-btn" onclick="switchController('Switch')">Switch</button>
-                <button class="popup-btn" onclick="switchController('Playstation')">Playstation</button>
-                <button class="popup-btn" onclick="switchController('XBox')">XBox</button>
+                <button class="popup-btn" onclick="switchController(this)" data-image="images/switch-controller.png">Switch</button>
+                <button class="popup-btn" onclick="switchController(this)" data-image="images/playstation-controller.png">Playstation</button>
+                <button class="popup-btn" onclick="switchController(this)" data-image="images/xbox-controller.svg">XBox</button>
             </div>
             <div class="popup-buttons">
                 <button class="popup-btn popup-btn-secondary" onclick="closePopup('newConfigPopup')">Cancel</button>

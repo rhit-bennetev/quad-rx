@@ -58,9 +58,18 @@
         closePopup();
     }
 
-    function switchController(controller){
-
+    function switchController(button){
         //TODO: make it switch controller diagrams.
+        const imagePath = button.dataset.image;
+        if (!imagePath){
+            closePopup('newConfigPopup');
+            alert("Oops! This controller is not currently configurable.")
+            return;
+        } 
+        const controller = document.getElementById("controller");
+        controller.style.backgroundImage = `url("${imagePath}")`;
+
+        configureOverlay();
 
         closePopup('newConfigPopup');
     }
