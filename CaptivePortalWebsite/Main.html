@@ -65,12 +65,17 @@
         <div class="popup-content">
             <div class="popup-header" id="popupHeader">Configure Button</div>
             <div class="popup-body">
-                <label for="actionInput">Assign Action:</label>
-                <input type="text" id="actionInput" class="popup-input" placeholder="Enter action or key binding...">
+                <label for="actionInput">Assign Button:</label>
+                <select id="actionInput" class="popup-input">
+                    <option value="y">Y</option>
+                    <option value="b">B</option>
+                    <option value="a">A</option>
+                    <option value="x">X</option>
+                </select>
             </div>
             <div class="popup-buttons">
                 <button class="popup-btn popup-btn-secondary" onclick="closePopup('bindingbox')">Cancel</button>
-                <button class="popup-btn popup-btn-primary" onclick="saveConfiguration()">Save</button>
+                <button class="popup-btn popup-btn-primary" onclick="saveBinding()">Save</button>
             </div>
         </div>
     </div>
@@ -84,6 +89,19 @@
             </div>
             <div class="popup-buttons">
                 <button class="popup-btn popup-btn-secondary" onclick="closePopup('newConfigPopup')">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="namingbox">
+        <div class="popup-content">
+            <div class="popup-header" id="popupHeader">Name your Controller Profile</div>
+            <div class="popup-body">
+                <label for="nameInput">Name Configuration:</label>
+                <input type="text" id="nameInput" class="modal-input" placeholder="New Configuration">
+            </div>
+            <div class="popup-buttons">
+                <button class="popup-btn popup-btn-secondary" onclick="closePopup('namingbox')">Cancel</button>
+                <button class="popup-btn popup-btn-primary" onclick="saveConfiguration()">Save</button>
             </div>
         </div>
     </div>

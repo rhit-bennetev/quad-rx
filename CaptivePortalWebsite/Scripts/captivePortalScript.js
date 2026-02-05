@@ -1,5 +1,6 @@
 
     let currentButton = '';
+    let currentConfig = "New Configuration"
     const config = {};
 
     function toggleDropdown() {
@@ -23,12 +24,15 @@
             case 'new':
                 openNewConfig()
                 Object.keys(config).forEach(key => delete config[key]);
+                currentConfig = "New Configuration"
                 break;
             case 'load':
-                alert('Load configuration feature would open a file picker here.');
+
+                loadConfigFromTP();
+                applyConfigToUI();
                 break;
             case 'save':
-                alert('Configuration saved:\n' + JSON.stringify(config, null, 2));
+                nameConfiguration();
                 break;
         }
     }
@@ -49,27 +53,79 @@
         document.getElementById('actionInput').value = '';
     }
 
-    function saveConfiguration() {
+    function saveBinding() {
         const action = document.getElementById('actionInput').value;
         if (action) {
             config[currentButton] = action;
-            alert(`${currentButton} configured to: ${action}`);
+            console.log(`${currentButton} configured to: ${action}`);
         }
-        closePopup();
+        closePopup('bindingbox');
+    }
+
+    function nameConfiguration(){
+        document.getElementById('namingbox').classList.add('show');
+        //document.getElementById('nameInput').placeholder = currentConfig
+
+    }
+
+    function saveConfiguration(){
+        if(currentConfig != "New Configuration"){
+            //TODO: Add function to delete old profile with current name before saving new one
+        }
+        currentConfig = document.getElementById('nameInput').value;
+        console.log(`Saved New Configuration as ${currentConfig}`)
+        sendConfigToTP();
+        closePopup('namingbox');
+    }
+
+    function sendConfigToTP() {
+        fetch("/saveProfile", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                profile: currentConfig,
+                bindings: config
+            })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Save failed");
+            console.log("Profile saved!");
+        })
+        .catch(err => console.error(err));
+    }
+
+    function loadConfigFromTP() {
+        fetch("/loadConfig")
+            .then(res => res.json())
+            .then(data => {
+                Object.assign(config, data);
+                applyConfigToUI();
+            })
+            .catch(err => console.error("Error loading config:", err));
+    }
+
+    function applyConfigToUI() {
+        for (const button in config) {
+            const el = document.getElementById(button);
+            if (el) {
+                el.value = config[button];
+            }
+        }
     }
 
     function switchController(button){
-        //TODO: make it switch controller diagrams.
         const imagePath = button.dataset.image;
         if (!imagePath){
             closePopup('newConfigPopup');
             alert("Oops! This controller is not currently configurable.")
             return;
-        } 
+        }
         const controller = document.getElementById("controller");
         controller.style.backgroundImage = `url("${imagePath}")`;
 
-        configureOverlay();
+        //TODO:Create configureOverlay() function that moves buttons onto new images
 
         closePopup('newConfigPopup');
     }
