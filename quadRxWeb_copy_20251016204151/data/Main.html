@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controller Configuration Manager</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <script type="text/javascript" src="scripts/captivePortalScript.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">QuadRX</div>
+        <div class="dropdown">
+            <button class="dropdown-btn" onclick="toggleDropdown()">Menu</button>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-item" onclick="handleMenuOption('new')">New Configuration</div>
+                <div class="dropdown-item" onclick="handleMenuOption('load')">Load Configuration</div>
+                <div class="dropdown-item" onclick="handleMenuOption('save')">Save Configuration</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Controller Configuration Manager</h1>
+        <div class="controller-container">
+            <div class="controller-wrapper">
+                <div id="controller" class="controller">
+                    <div class="">
+                        <!-- Shoulder Buttons -->
+                        <div class="shoulder-btn lt" onclick="openPopup('LT')">LT</div>
+                        <div class="shoulder-btn rt" onclick="openPopup('RT')">RT</div>
+                        <div class="shoulder-btn lb" onclick="openModal('LB')">LB</div>
+                        <div class="shoulder-btn rb" onclick="openModal('RB')">RB</div>
+
+                        <!-- D-Pad -->
+                        <div class="dpad">
+                            <div class="dpad-btn dpad-up" onclick="openPopup('D-Pad Up')"></div>
+                            <div class="dpad-btn dpad-down" onclick="openPopup('D-Pad Down')"></div>
+                            <div class="dpad-btn dpad-left" onclick="openPopup('D-Pad Left')"></div>
+                            <div class="dpad-btn dpad-right" onclick="openPopup('D-Pad Right')"></div>
+                        </div>
+
+                        <!-- Face Buttons -->
+                        <div class="face-buttons">
+                            <div class="face-btn btn-y" onclick="openPopup('Y Button')">Y</div>
+                            <div class="face-btn btn-b" onclick="openPopup('B Button')">B</div>
+                            <div class="face-btn btn-a" onclick="openPopup('A Button')">A</div>
+                            <div class="face-btn btn-x" onclick="openPopup('X Button')">X</div>
+                        </div>
+
+                        <!-- Center Buttons -->
+                        <div class="center-buttons">
+                            <div class="center-btn" onclick="openPopup('Select')"></div>
+                            <div class="center-btn" onclick="openPopup('Start')"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup" id="bindingbox">
+        <div class="popup-content">
+            <div class="popup-header" id="popupHeader">Configure Button</div>
+            <div class="popup-body">
+                <label for="actionInput">Assign Button:</label>
+                <select id="actionInput" class="popup-input">
+                    <option value="y">Y</option>
+                    <option value="b">B</option>
+                    <option value="a">A</option>
+                    <option value="x">X</option>
+                </select>
+            </div>
+            <div class="popup-buttons">
+                <button class="popup-btn popup-btn-secondary" onclick="closePopup('bindingbox')">Cancel</button>
+                <button class="popup-btn popup-btn-primary" onclick="saveBinding()">Save</button>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="newConfigPopup">
+        <div class="popup-content">
+            <div class="popup-header" id="popupHeader">Console Configuration</div>
+            <div class="popup-body">
+                <button class="popup-btn" onclick="switchController(this)" data-image="images/switch-controller.png">Switch</button>
+                <button class="popup-btn" onclick="switchController(this)" data-image="images/playstation-controller.png">Playstation</button>
+                <button class="popup-btn" onclick="switchController(this)" data-image="images/xbox-controller.svg">XBox</button>
+            </div>
+            <div class="popup-buttons">
+                <button class="popup-btn popup-btn-secondary" onclick="closePopup('newConfigPopup')">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="namingbox">
+        <div class="popup-content">
+            <div class="popup-header" id="popupHeader">Name your Controller Profile</div>
+            <div class="popup-body">
+                <label for="nameInput">Name Configuration:</label>
+                <input type="text" id="nameInput" class="modal-input" placeholder="New Configuration">
+            </div>
+            <div class="popup-buttons">
+                <button class="popup-btn popup-btn-secondary" onclick="closePopup('namingbox')">Cancel</button>
+                <button class="popup-btn popup-btn-primary" onclick="saveConfiguration()">Save</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

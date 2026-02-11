@@ -6,6 +6,9 @@
 #include <DNSServer.h>
 #include <ESPAsyncWebServer.h>	//https://github.com/me-no-dev/ESPAsyncWebServer using the latest dev version from @me-no-dev
 #include <esp_wifi.h>			//Used for mpdu_rx_disable android workaround
+#include <ArduinoJson.h> //For handling profile Jsons
+#include <LittleFS.h> 	//Replictes a file system on an ESP32 device.
+
 
 // Pre reading on the fundamentals of captive portals https://textslashplain.com/2022/06/24/captive-portals/
 
@@ -42,6 +45,13 @@ const char index_html[] PROGMEM = R"=====(
     </body>
   </html>
 )=====";
+
+String currentProfile = "default";
+
+String profilePath(String name) {
+  return "/profiles/" + name + ".json";
+}
+
 
 DNSServer dnsServer;
 AsyncWebServer server(80);
@@ -112,14 +122,6 @@ void setUpWebserver(AsyncWebServer &server, const IPAddress &localIP) {
 	// return 404 to webpage icon
 	server.on("/favicon.ico", [](AsyncWebServerRequest *request) { request->send(404); });	// webpage icon
 
-	// Serve Basic HTML Page
-	server.on("/", HTTP_ANY, [](AsyncWebServerRequest *request) {
-		AsyncWebServerResponse *response = request->beginResponse(200, "text/html", index_html);
-		response->addHeader("Cache-Control", "public,max-age=31536000");  // save this file to cache for 1 year (unless you refresh)
-		request->send(response);
-		Serial.println("Served Basic HTML Page");
-	});
-
 	// the catch all
 	server.onNotFound([](AsyncWebServerRequest *request) {
 		request->redirect(localIPURL);
@@ -148,6 +150,17 @@ void setup() {
 
 	setUpDNSServer(dnsServer, localIP);
 
+	if (!LittleFS.begin(true)) {
+    Serial.println("LittleFS Mount Failed!");
+    return;
+  }
+
+  if (!LittleFS.exists("/profiles")) {
+    LittleFS.mkdir("/profiles");
+  }
+
+	setupEndpoints();
+
 	setUpWebserver(server, localIP);
 	server.begin();
 
@@ -155,6 +168,120 @@ void setup() {
 	Serial.print("Startup Time:");	// should be somewhere between 270-350 for Generic ESP32 (D0WDQ6 chip, can have a higher startup time on first boot)
 	Serial.println(millis());
 	Serial.print("\n");
+}
+
+void setupEndpoints() {
+	//Serve Website
+  server.serveStatic("/", LittleFS, "/").setDefaultFile("Main.html");
+
+  //Save Profile
+  server.on("/saveProfile", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+
+		DynamicJsonDocument doc(2048);
+		if (deserializeJson(doc, data)) {
+			request->send(400, "application/json", "{\"error\":\"Bad JSON\"}");
+			return;
+		}
+
+		String profileName = doc["profile"];
+		JsonObject bindings = doc["bindings"];
+
+		if (profileName == "") {
+			request->send(400, "application/json", "{\"error\":\"Missing profile name\"}");
+			return;
+		}
+
+		currentProfile = profileName;
+		String filename = profilePath(profileName);
+
+		File file = LittleFS.open(filename, "w");
+		if (!file) {
+			request->send(500, "application/json", "{\"error\":\"Write failed\"}");
+			return;
+		}
+
+		serializeJson(bindings, file);
+		file.close();
+
+		Serial.println("Saved: " + filename);
+
+		request->send(200, "application/json", "{\"status\":\"Profile saved\"}");
+	});
+
+		//Load Profile by Name
+  server.on("/loadConfig", HTTP_GET, [](AsyncWebServerRequest *request) {
+
+    if (!request->hasParam("profile")) {
+      request->send(400, "application/json", "{\"error\":\"Missing profile parameter\"}");
+      return;
+    }
+
+    String profileName = request->getParam("profile")->value();
+    String filename = profilePath(profileName);
+
+    if (!LittleFS.exists(filename)) {
+      request->send(404, "application/json", "{\"error\":\"Profile not found\"}");
+      return;
+    }
+
+    File file = LittleFS.open(filename, "r");
+    String json = file.readString();
+    file.close();
+
+    currentProfile = profileName;
+
+    request->send(200, "application/json", json);
+  });
+
+	// List All Profiles
+  server.on("/listProfiles", HTTP_GET, [](AsyncWebServerRequest *request) {
+
+    File root = LittleFS.open("/profiles");
+    if (!root || !root.isDirectory()) {
+      request->send(500, "application/json", "{\"error\":\"Profiles folder missing\"}");
+      return;
+    }
+
+    DynamicJsonDocument doc(1024);
+    JsonArray arr = doc.to<JsonArray>();
+
+    File file = root.openNextFile();
+    while (file) {
+      String name = file.name(); // "/profiles/test.json"
+      name.replace("/profiles/", "");
+      name.replace(".json", "");
+      arr.add(name);
+
+      file = root.openNextFile();
+    }
+
+    String output;
+    serializeJson(arr, output);
+
+    request->send(200, "application/json", output);
+  });
+
+  // Delete Profile
+  server.on("/deleteProfile", HTTP_DELETE, [](AsyncWebServerRequest *request) {
+
+    if (!request->hasParam("profile")) {
+      request->send(400, "application/json", "{\"error\":\"Missing profile\"}");
+      return;
+    }
+
+    String profileName = request->getParam("profile")->value();
+    String filename = profilePath(profileName);
+
+    if (!LittleFS.exists(filename)) {
+      request->send(404, "application/json", "{\"error\":\"Profile not found\"}");
+      return;
+    }
+
+    LittleFS.remove(filename);
+
+    request->send(200, "application/json", "{\"status\":\"Profile deleted\"}");
+  });
+
 }
 
 void loop() {
