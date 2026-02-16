@@ -1,0 +1,442 @@
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    /* Navigation Bar */
+    nav {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .invis {
+        opacity: 0;
+    }
+
+    .disabled {
+        display: none;
+    }
+
+    .logo::before {
+        content: "🎮";
+        font-size: 2rem;
+    }
+
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-btn {
+        background: #667eea;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background 0.3s;
+    }
+
+    .dropdown-btn:hover {
+        background: #5568d3;
+    }
+
+    .dropdown-btn::after {
+        content: "▼";
+        font-size: 0.8rem;
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        min-width: 200px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+        z-index: 1000;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background: #f8f9fa;
+    }
+
+    /* Main Content */
+    .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    h1 {
+        color: white;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .controller-wrapper {
+        width: 100%;
+        max-width: 900px;
+
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Controller Container */
+    .controller-container {
+         background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Controller SVG */
+    .controller {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+
+        aspect-ratio: 2 / 1;
+        background-image: url("../images/xbox-controller.svg");
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        border-radius: 100px;
+    }
+
+    /* D-Pad */
+    .dpad {
+        position: absolute;
+        left: 18%;
+        top: 38%;
+        width: 12%;
+        aspect-ratio: 1 / 1;
+    }
+
+    .dpad-btn {
+        position: absolute;
+        width: 30%;
+        height: 30%;
+        background: #555;
+        border: 2px solid #333;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .dpad-btn:hover {
+        background: #667eea;
+        transform: scale(1.1);
+    }
+
+    .dpad-up {
+        top: 0;
+        left: 35%;
+        border-radius: 5% 5% 0 0;
+        -webkit-border-radius: 5% 5% 0 0;
+        -moz-border-radius: 5% 5% 0 0;
+        -ms-border-radius: 5% 5% 0 0;
+        -o-border-radius: 5% 5% 0 0;
+}
+
+    .dpad-down {
+        bottom: 0;
+        left: 35%;
+        border-radius: 0 0 5% 5%;
+        -webkit-border-radius: 0 0 5% 5%;
+        -moz-border-radius: 0 0 5% 5%;
+        -ms-border-radius: 0 0 5% 5%;
+        -o-border-radius: 0 0 5% 5%;
+}
+
+    .dpad-left {
+        left: 0;
+        top: 35%;
+        border-radius: 5% 0 0 5%;
+        -webkit-border-radius: 5% 0 0 5%;
+        -moz-border-radius: 5% 0 0 5%;
+        -ms-border-radius: 5% 0 0 5%;
+        -o-border-radius: 5% 0 0 5%;
+}
+
+    .dpad-right {
+        right: 0;
+        top: 35%;
+        border-radius: 0 5% 5% 0;
+        -webkit-border-radius: 0 5% 5% 0;
+        -moz-border-radius: 0 5% 5% 0;
+        -ms-border-radius: 0 5% 5% 0;
+        -o-border-radius: 0 5% 5% 0;
+}
+
+    /* Face Buttons */
+    .face-buttons {
+        position: absolute;
+        right: 25.5%;
+        top: 34.5%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        width: 14%;
+        aspect-ratio: 1 / 1;
+    }
+
+    .face-btn {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+
+        border-radius: 50%;
+        font-size: clamp(0.8rem, 1.2vw, 1.1rem);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+
+        font-weight: bold;
+        color: white;
+    }
+
+    .face-btn:hover {
+        transform: scale(1.15);
+        box-shadow: 0 0 19% currentColor;
+    }
+
+    .btn-a {
+        background: #4caf50;
+        grid-column: 2; 
+        grid-row: 3;
+    }
+
+    .btn-b {
+        background: #f44336;
+        grid-column: 3; 
+        grid-row: 2;
+    }
+
+    .btn-x {
+        background: #2196f3;
+        grid-column: 1; 
+        grid-row: 2;
+    }
+
+    .btn-y {
+        background: #ffc107;
+        grid-column: 2; 
+        grid-row: 1;
+    }
+
+    /* Shoulder Buttons */
+    .shoulder-btn {
+        position: absolute;
+        width: 10%;
+        height: 7.5%;
+        font-size: clamp(0.7rem, 1.2vw, 1rem);
+        background: #666;
+        border: 2px solid #333;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+    }
+
+    .shoulder-btn:hover {
+        background: #667eea;
+        transform: translateY(-3px);
+    }
+
+    .lb {
+        left: 12%;
+        top: 12%;
+    }
+
+    .rb {
+        right: 12%;
+        top: 12%;
+    }
+
+    .lt {
+        left: 6%;
+        top: 4%
+    }
+
+    .rt {
+        right: 6%;
+        top: 4%;
+    }
+
+    /* Center Buttons */
+    .center-buttons {
+        position: absolute;
+        width: 15%;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        gap: 50%;
+        aspect-ratio: 1 / 1;
+    }
+
+    .center-btn {
+        width: 25%;
+        height: 25%;
+        background: #555;
+        border: 2px solid #333;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .center-btn:hover {
+        background: #667eea;
+        transform: scale(1.1);
+    }
+
+    /* Popup */
+    .popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .popup.show {
+        display: flex;
+    }
+
+    .popup-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        min-width: 300px;
+        max-width: 500px;
+    }
+
+    .popup-header {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: #667eea;
+    }
+
+    .popup-body {
+        margin-bottom: 1.5rem;
+    }
+
+    .popup-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .popup-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .popup-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+
+    .popup-btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .popup-btn-primary:hover {
+        background: #5568d3;
+    }
+
+    .popup-btn-secondary {
+        background: #ddd;
+        color: #333;
+    }
+
+    .popup-btn-secondary:hover {
+        background: #ccc;
+    }
+
+    /* Phone and Tablet Settings */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        .controller-container {
+            padding: 1rem;
+        }
+
+        .center-buttons {
+            gap: 20px;
+        }
+    }
