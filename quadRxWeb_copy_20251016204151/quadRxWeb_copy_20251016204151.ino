@@ -22,29 +22,11 @@ const byte joystickY = 4;
 #define MAX_CLIENTS 4	// ESP32 supports up to 10 but I have not tested it yet
 #define WIFI_CHANNEL 6	// 2.4ghz channel 6 https://en.wikipedia.org/wiki/List_of_WLAN_channels#2.4_GHz_(802.11b/g/n/ax)
 
-const IPAddress localIP(4, 3, 2, 1);		   // the IP address the web server, Samsung requires the IP to be in public space
-const IPAddress gatewayIP(4, 3, 2, 1);		   // IP address of the network should be the same as the local IP for captive portals
+const IPAddress localIP(192, 168, 4, 1);		   // the IP address the web server, Samsung requires the IP to be in public space
+const IPAddress gatewayIP(192, 168, 4, 1);		   // IP address of the network should be the same as the local IP for captive portals
 const IPAddress subnetMask(255, 255, 255, 0);  // no need to change: https://avinetworks.com/glossary/subnet-mask/
 
-const String localIPURL = "http://4.3.2.1";	 // a string version of the local IP with http, used for redirecting clients to your webpage
-
-const char index_html[] PROGMEM = R"=====(
-  <!DOCTYPE html> <html>
-    <head>
-      <title>ESP32 Captive Portal</title>
-      <style>
-        body {background-color:#06cc13;}
-        h1 {color: white;}
-        h2 {color: white;}
-      </style>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-      <h1>Hello World!</h1>
-      <h2>This is a captive portal example. All requests will be redirected here </h2>
-    </body>
-  </html>
-)=====";
+const String localIPURL = "http://192.168.4.1";	 // a string version of the local IP with http, used for redirecting clients to your webpage
 
 String currentProfile = "default";
 
@@ -113,64 +95,32 @@ void setUpWebserver(AsyncWebServer &server, const IPAddress &localIP) {
 	server.on("/success.txt", [](AsyncWebServerRequest *request) { request->send(200); });					   // firefox captive portal call home
 	server.on("/ncsi.txt", [](AsyncWebServerRequest *request) { request->redirect(localIPURL); });			   // windows call home
 
-	// B Tier (uncommon)
-	//  server.on("/chrome-variations/seed",[](AsyncWebServerRequest *request){request->send(200);}); //chrome captive portal call home
-	//  server.on("/service/update2/json",[](AsyncWebServerRequest *request){request->send(200);}); //firefox?
-	//  server.on("/chat",[](AsyncWebServerRequest *request){request->send(404);}); //No stop asking Whatsapp, there is no internet connection
-	//  server.on("/startpage",[](AsyncWebServerRequest *request){request->redirect(localIPURL);});
-
 	// return 404 to webpage icon
 	server.on("/favicon.ico", [](AsyncWebServerRequest *request) { request->send(404); });	// webpage icon
 
 	// the catch all
 	server.onNotFound([](AsyncWebServerRequest *request) {
-		request->redirect(localIPURL);
-		Serial.print("onnotfound ");
-		Serial.print(request->host());	// This gives some insight into whatever was being requested on the serial monitor
-		Serial.print(" ");
-		Serial.print(request->url());
-		Serial.print(" sent redirect to " + localIPURL + "\n");
-	});
-}
 
-void setup() {
-	// Set the transmit buffer size for the Serial object and start it with a baud rate of 115200.
-	Serial.setTxBufferSize(1024);
-	Serial.begin(115200);
+    // Allow real file requests through
+    if (request->url().endsWith(".css") ||
+        request->url().endsWith(".js") ||
+        request->url().endsWith(".png") ||
+        request->url().endsWith(".jpg")) {
 
-	// Wait for the Serial object to become available.
-	while (!Serial)
-		;
+      request->send(404);
+      return;
+    }
 
-	// Print a welcome message to the Serial port.
-	Serial.println("\n\nCaptive Test, V0.5.0 compiled " __DATE__ " " __TIME__ " by CD_FER");  //__DATE__ is provided by the platformio ide
-	Serial.printf("%s-%d\n\r", ESP.getChipModel(), ESP.getChipRevision());
-
-	startSoftAccessPoint(ssid, password, localIP, gatewayIP);
-
-	setUpDNSServer(dnsServer, localIP);
-
-	if (!LittleFS.begin(true)) {
-    Serial.println("LittleFS Mount Failed!");
-    return;
-  }
-
-  if (!LittleFS.exists("/profiles")) {
-    LittleFS.mkdir("/profiles");
-  }
-
-	setupEndpoints();
-
-	setUpWebserver(server, localIP);
-	server.begin();
-
-	Serial.print("\n");
-	Serial.print("Startup Time:");	// should be somewhere between 270-350 for Generic ESP32 (D0WDQ6 chip, can have a higher startup time on first boot)
-	Serial.println(millis());
-	Serial.print("\n");
+    request->redirect(localIPURL);
+  });
 }
 
 void setupEndpoints() {
+	//Serve Main Portal Page
+	server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(LittleFS, "/Main.html", "text/html");
+  });
+
 	//Serve Website
   server.serveStatic("/", LittleFS, "/").setDefaultFile("Main.html");
 
@@ -282,6 +232,43 @@ void setupEndpoints() {
     request->send(200, "application/json", "{\"status\":\"Profile deleted\"}");
   });
 
+}
+
+void setup() {
+	// Set the transmit buffer size for the Serial object and start it with a baud rate of 115200.
+	Serial.setTxBufferSize(1024);
+	Serial.begin(115200);
+
+	// Wait for the Serial object to become available.
+	while (!Serial)
+		;
+
+	// Print a welcome message to the Serial port.
+	Serial.println("\n\nCaptive Test, V0.5.0 compiled " __DATE__ " " __TIME__ " by CD_FER");  //__DATE__ is provided by the platformio ide
+	Serial.printf("%s-%d\n\r", ESP.getChipModel(), ESP.getChipRevision());
+
+	startSoftAccessPoint(ssid, password, localIP, gatewayIP);
+
+	setUpDNSServer(dnsServer, localIP);
+
+	if (!LittleFS.begin(true)) {
+    Serial.println("LittleFS Mount Failed!");
+    return;
+  }
+
+  if (!LittleFS.exists("/profiles")) {
+    LittleFS.mkdir("/profiles");
+  }
+
+	setupEndpoints();
+
+	setUpWebserver(server, localIP);
+	server.begin();
+
+	Serial.print("\n");
+	Serial.print("Startup Time:");	// should be somewhere between 270-350 for Generic ESP32 (D0WDQ6 chip, can have a higher startup time on first boot)
+	Serial.println(millis());
+	Serial.print("\n");
 }
 
 void loop() {

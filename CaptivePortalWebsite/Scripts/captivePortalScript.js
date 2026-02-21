@@ -2,6 +2,14 @@
     let currentButton = '';
     let currentConfig = "New Configuration"
     const config = {};
+    let profileList = [];
+    let favorites = [];
+    const MAX_PROFILES = 20;
+    const MAX_FAVORITES = 3
+
+    window.onload = function () {
+        fetchProfileList();
+    };
 
     function toggleDropdown() {
         const menu = document.getElementById('dropdownMenu');
@@ -27,9 +35,7 @@
                 currentConfig = "New Configuration"
                 break;
             case 'load':
-                //TODO: Some method to pick config to load
-                //currentConfig = someconfig
-                loadConfigFromTP();
+                openPopup('profileSelector')
                 break;
             case 'save':
                 nameConfiguration();
@@ -37,20 +43,29 @@
         }
     }
 
-    function openPopup(buttonName) {
+    function openBindingPopup(buttonName) {
         currentButton = buttonName;
         document.getElementById('popupHeader').textContent = `Configure ${buttonName}`;
         document.getElementById('actionInput').value = config[buttonName] || '';
-        document.getElementById('bindingbox').classList.add('show');
+        openPopup('bindingbox');
     }
 
-    function openNewConfig(){
-        document.getElementById('newConfigPopup').classList.add('show');
+    function openPopup(popupType){
+        document.getElementById(popupType).classList.add('show');
     }
 
     function closePopup(popupType) {
-        document.getElementById(popupType).classList.remove('show');
-        document.getElementById('actionInput').value = '';
+        if (popupType === 'all') {
+            const popups = document.getElementsByClassName('popup');
+            for (let i = 0; i < popups.length; i++) {
+                popups[i].classList.remove('show');
+            }
+            return;
+        }
+        else{
+            document.getElementById(popupType).classList.remove('show');
+            document.getElementById('actionInput').value = '';
+        }
     }
 
     function saveBinding() {
@@ -69,10 +84,13 @@
     }
 
     function saveConfiguration(){
-        if(currentConfig != "New Configuration"){
-            //TODO: Add function to delete old profile with current name before saving new one
+        const newName = document.getElementById("nameInput").value;
+        if (!newName) return alert("Enter a name.");
+
+        if (!profileList.includes(newName) && profileList.length >= MAX_PROFILES) {
+            return alert("Maximum of 20 profiles reached. Delete one first.");
         }
-        currentConfig = document.getElementById('nameInput').value;
+        currentConfig = newName;
         console.log(`Saved New Configuration as ${currentConfig}`)
         sendConfigToTP();
         closePopup('namingbox');
@@ -96,6 +114,13 @@
         .catch(err => console.error(err));
     }
 
+    function loadSelectedProfile() {
+        const profileName = document.getElementById("profileDropdown").value;
+        if (!profileName) return alert("Select a profile first.");
+
+        loadConfigFromTP(profileName);
+    }
+
     function loadConfigFromTP(profileName) {
         fetch(`/loadConfig?profile=${profileName}`)
             .then(res => res.json())
@@ -104,6 +129,14 @@
                 applyConfigToUI();
             })
             .catch(err => console.error("Error loading config:", err));
+    }
+
+    function deleteSelectedProfile() {
+        const profileName = document.getElementById("profileDropdown").value;
+        if (!profileName) return alert("Select a profile first.");
+
+        deleteProfile(profileName);
+        closePopup()
     }
 
     function deleteProfile(profileName) {
@@ -139,9 +172,35 @@
         closePopup('newConfigPopup');
     }
 
+    function fetchProfileList() {
+        fetch("/listProfiles")
+            .then(res => res.json())
+            .then(data => {
+                profileList = data.profiles || [];
+                favorites = data.favorites || [];
+
+                populateSelector();
+                console.log("Profiles loaded:", profileList);
+            })
+            .catch(err => console.error("Failed loading profile list:", err));
+    }
+
+    function populateSelector() {
+        const dropdown = document.getElementById("profileDropdown");
+
+        dropdown.innerHTML = `<option value="">-- Select Profile --</option>`;
+
+        profileList.forEach(profile => {
+            const option = document.createElement("option");
+            option.value = profile;
+            option.textContent = profile;
+            dropdown.appendChild(option);
+        });
+    }
+
     // Close popup with Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            closePopup();
+            closePopup('all');
         }
     });

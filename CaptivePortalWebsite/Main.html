@@ -11,11 +11,16 @@
     <!-- Navigation -->
     <nav>
         <div class="logo">QuadRX</div>
+        <div>
+            <button class="dropdown-item" onclick="loadFavorite(0)">Fave1</button>
+            <button class="dropdown-item" onclick="loadFavorite(1)">Fave2</button>
+            <button class="dropdown-item" onclick="loadFavorite(2)">Fave3</button>
+        </div>
         <div class="dropdown">
-            <button class="dropdown-btn" onclick="toggleDropdown()">Menu</button>
+            <button class="dropdown-btn" onclick="toggleDropdown('dropdownMenu')">Menu</button>
             <div class="dropdown-menu" id="dropdownMenu">
                 <div class="dropdown-item" onclick="handleMenuOption('new')">New Configuration</div>
-                <div class="dropdown-item" onclick="handleMenuOption('load')">Load Configuration</div>
+                <div class="dropdown-item" onclick="handleMenuOption('load')">Manage Configurations</div>
                 <div class="dropdown-item" onclick="handleMenuOption('save')">Save Configuration</div>
             </div>
         </div>
@@ -29,31 +34,31 @@
                 <div id="controller" class="controller">
                     <div class="">
                         <!-- Shoulder Buttons -->
-                        <div class="shoulder-btn lt" onclick="openPopup('LT')">LT</div>
-                        <div class="shoulder-btn rt" onclick="openPopup('RT')">RT</div>
-                        <div class="shoulder-btn lb" onclick="openModal('LB')">LB</div>
-                        <div class="shoulder-btn rb" onclick="openModal('RB')">RB</div>
+                        <div id="LT" class="shoulder-btn lt" onclick="openBindingPopup('LT')">LT</div>
+                        <div id="RT" class="shoulder-btn rt" onclick="openBindingPopup('RT')">RT</div>
+                        <div id="LB" class="shoulder-btn lb" onclick="openBindingPopup('LB')">LB</div>
+                        <div id="RB" class="shoulder-btn rb" onclick="openBindingPopup('RB')">RB</div>
 
                         <!-- D-Pad -->
                         <div class="dpad">
-                            <div class="dpad-btn dpad-up" onclick="openPopup('D-Pad Up')"></div>
-                            <div class="dpad-btn dpad-down" onclick="openPopup('D-Pad Down')"></div>
-                            <div class="dpad-btn dpad-left" onclick="openPopup('D-Pad Left')"></div>
-                            <div class="dpad-btn dpad-right" onclick="openPopup('D-Pad Right')"></div>
+                            <div id="dpad-up" class="dpad-btn dpad-up" onclick="openBindingPopup('D-Pad Up')"></div>
+                            <div id="dpad-down" class="dpad-btn dpad-down" onclick="openBindingPopup('D-Pad Down')"></div>
+                            <div id="dpad-left" class="dpad-btn dpad-left" onclick="openBindingPopup('D-Pad Left')"></div>
+                            <div id="dpad-right" class="dpad-btn dpad-right" onclick="openBindingPopup('D-Pad Right')"></div>
                         </div>
 
                         <!-- Face Buttons -->
                         <div class="face-buttons">
-                            <div class="face-btn btn-y" onclick="openPopup('Y Button')">Y</div>
-                            <div class="face-btn btn-b" onclick="openPopup('B Button')">B</div>
-                            <div class="face-btn btn-a" onclick="openPopup('A Button')">A</div>
-                            <div class="face-btn btn-x" onclick="openPopup('X Button')">X</div>
+                            <div id="face-y" class="face-btn btn-y" onclick="openBindingPopup('Y Button')">Y</div>
+                            <div id="face-b" class="face-btn btn-b" onclick="openBindingPopup('B Button')">B</div>
+                            <div id="face-a" class="face-btn btn-a" onclick="openBindingPopup('A Button')">A</div>
+                            <div id="face-x" class="face-btn btn-x" onclick="openBindingPopup('X Button')">X</div>
                         </div>
 
                         <!-- Center Buttons -->
                         <div class="center-buttons">
-                            <div class="center-btn" onclick="openPopup('Select')"></div>
-                            <div class="center-btn" onclick="openPopup('Start')"></div>
+                            <div id="face-select" class="center-btn" onclick="openBindingPopup('Select')"></div>
+                            <div id="face-start" class="center-btn" onclick="openBindingPopup('Start')"></div>
                         </div>
                     </div>
                 </div>
@@ -81,7 +86,7 @@
     </div>
     <div class="popup" id="newConfigPopup">
         <div class="popup-content">
-            <div class="popup-header" id="popupHeader">Console Configuration</div>
+            <div class="popup-header">Console Configuration</div>
             <div class="popup-body">
                 <button class="popup-btn" onclick="switchController(this)" data-image="images/switch-controller.png">Switch</button>
                 <button class="popup-btn" onclick="switchController(this)" data-image="images/playstation-controller.png">Playstation</button>
@@ -94,7 +99,7 @@
     </div>
     <div class="popup" id="namingbox">
         <div class="popup-content">
-            <div class="popup-header" id="popupHeader">Name your Controller Profile</div>
+            <div class="popup-header">Name your Controller Profile</div>
             <div class="popup-body">
                 <label for="nameInput">Name Configuration:</label>
                 <input type="text" id="nameInput" class="modal-input" placeholder="New Configuration">
@@ -103,6 +108,17 @@
                 <button class="popup-btn popup-btn-secondary" onclick="closePopup('namingbox')">Cancel</button>
                 <button class="popup-btn popup-btn-primary" onclick="saveConfiguration()">Save</button>
             </div>
+        </div>
+    </div>
+    <div class="popup" id="profileSelector">
+        <div class="popup-content">
+            <select class="modal-input" id="profileDropdown">
+                <option value="">-- Select Profile --</option>
+            </select>
+            <div class="popup-buttons">
+                <button class="popup-btn popup-btn-secondary" onclick="deleteSelectedProfile()">Delete</button>
+                <button class="popup-btn popup-btn-secondary" onclick="loadSelectedProfile()">Load</button>
+            </div> 
         </div>
     </div>
 </body>
