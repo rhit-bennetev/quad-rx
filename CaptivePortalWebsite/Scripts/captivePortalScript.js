@@ -42,7 +42,7 @@
         toggleDropdown();
         switch(option) {
             case 'new':
-                //openNewConfig()
+                openPopup('newConfigPopup');
                 Object.keys(config).forEach(key => delete config[key]);
                 currentConfig = "New Configuration"
                 break;
