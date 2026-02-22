@@ -31,6 +31,17 @@
         <h1>Controller Configuration Manager</h1>
         <div class="controller-container">
             <div class="controller-wrapper">
+                <div id="mouthpiece" class="mouthpiece">
+                    <div class="sip-puffs">
+                        <div id="SP1" class="sp-select" onclick="selectSipPuff('SP1')"></div>
+                        <div id="SP2" class="sp-select" onclick="selectSipPuff('SP2')"></div>
+                        <div id="SP3" class="sp-select" onclick="selectSipPuff('SP3')"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="controller-container">
+            <div class="controller-wrapper">
                 <div id="controller" class="controller">
                     <div class="">
                         <!-- Shoulder Buttons -->
@@ -49,10 +60,10 @@
 
                         <!-- Face Buttons -->
                         <div class="face-buttons">
-                            <div id="face-y" class="face-btn btn-y" onclick="openBindingPopup('Y Button')">Y</div>
-                            <div id="face-b" class="face-btn btn-b" onclick="openBindingPopup('B Button')">B</div>
-                            <div id="face-a" class="face-btn btn-a" onclick="openBindingPopup('A Button')">A</div>
-                            <div id="face-x" class="face-btn btn-x" onclick="openBindingPopup('X Button')">X</div>
+                            <div id="face-y" class="face-btn btn-y invis" onclick="openBindingPopup('Y Button')">Y</div>
+                            <div id="face-b" class="face-btn btn-b invis" onclick="openBindingPopup('B Button')">B</div>
+                            <div id="face-a" class="face-btn btn-a invis" onclick="openBindingPopup('A Button')">A</div>
+                            <div id="face-x" class="face-btn btn-x invis" onclick="openBindingPopup('X Button')">X</div>
                         </div>
 
                         <!-- Center Buttons -->

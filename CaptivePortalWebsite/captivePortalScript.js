@@ -251,6 +251,16 @@
         });
     }
 
+    function selectSipPuff(sipPuff){
+        const selectedInput = document.getElementById(sipPuff);
+        if(selectedInput.style.borderColor != "red"){
+            selectedInput.style.borderColor = "red"
+        }
+        else{
+            selectedInput.style.borderColor = "black"
+        }
+    }
+
     // Close popup with Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {

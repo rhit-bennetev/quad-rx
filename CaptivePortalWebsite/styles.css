@@ -157,6 +157,22 @@
         -o-border-radius: 20px;
     }
 
+    .mouthpiece {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        aspect-ratio: 2 / 1;
+        background-image: url("images/3SP_Mouthpiece.png");
+        background-size: 80%;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 20px;
+        -webkit-border-radius: 20px;
+        -moz-border-radius: 20px;
+        -ms-border-radius: 20px;
+        -o-border-radius: 20px;
+    }
+
     /* D-Pad */
     .dpad {
         position: absolute;
@@ -224,23 +240,23 @@
     /* Face Buttons */
     .face-buttons {
         position: absolute;
-        right: 26%;
-        top: 33.5%;
+        right: 19.3%;
+        top: 30.5%;
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: repeat(3, 1fr);
-        width: 14%;
+        grid-template-columns: 34% auto 30%;
+        grid-template-rows: 35% auto 35%;
+        width: 17.9%;
         aspect-ratio: 1 / 1;
     }
 
     .face-btn {
-        width: 110%;
+        width: min-content;
         aspect-ratio: 1 / 1;
 
         border-radius: 50%;
-        font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+        font-size: clamp(0.7rem, 1.5vw, 1.1rem);
 
-        display: flex;
+        display: flex; /* flex */
         align-items: center;
         justify-content: center;
         transition: all 0.2s;
@@ -348,6 +364,32 @@
         transform: scale(1.1);
     }
 
+    .sip-puffs {
+        position: absolute;
+        right: 23.8%;
+        top: 37.5%;
+        display: grid;
+        column-gap: 19%;
+        grid-template-columns: auto auto auto;
+        width: 53.5%;
+        height: 23%;
+        aspect-ratio: 1 / 1;
+    }
+
+    .sp-select {
+        background-color: transparent;
+        border: .5em solid black;
+        border-radius: 50%;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        -ms-border-radius: 50%;
+        -o-border-radius: 50%;
+    }
+
+    .sp-select:hover{
+        border-color: #667eea;
+    }
+
     /* Popup */
     .popup {
         display: none;
@@ -430,15 +472,29 @@
 
     /* Phone and Tablet Settings */
     @media (max-width: 768px) {
+        body{
+            flex-direction: column;
+        }
+
         h1 {
             font-size: 1.5rem;
+            margin-bottom: 0%;
         }
 
         .controller-container {
             padding: 1rem;
+            overflow-y: auto;
         }
 
         .center-buttons {
             gap: 20px;
+        }
+
+        .sp-select{
+            border-width: .1em;
+        }
+
+        .popup-content{
+            padding: 1rem;
         }
     }
