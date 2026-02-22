@@ -230,12 +230,12 @@
                 }
 
                 profileList = data;
-                populateDropdown();
+                populateSelector();
             })
             .catch(err => {
                 console.error("Profile list error:", err);
                 profileList = [];
-                populateDropdown();
+                populateSelector();
             });
     }
 

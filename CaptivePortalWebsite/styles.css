@@ -234,11 +234,11 @@
     }
 
     .face-btn {
-        width: 100%;
+        width: 110%;
         aspect-ratio: 1 / 1;
 
         border-radius: 50%;
-        font-size: clamp(0.8rem, 1.2vw, 1.1rem);
+        font-size: clamp(0.8rem, 1.5vw, 1.1rem);
 
         display: flex;
         align-items: center;
