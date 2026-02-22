@@ -145,14 +145,16 @@
         position: relative;
         width: 100%;
         max-width: 800px;
-
         aspect-ratio: 2 / 1;
         background-image: url("../images/xbox-controller.svg");
-        background-size: contain;
+        background-size: 80%;
         background-position: center;
         background-repeat: no-repeat;
-
-        border-radius: 100px;
+        border-radius: 20px;
+        -webkit-border-radius: 20px;
+        -moz-border-radius: 20px;
+        -ms-border-radius: 20px;
+        -o-border-radius: 20px;
     }
 
     /* D-Pad */
@@ -222,8 +224,8 @@
     /* Face Buttons */
     .face-buttons {
         position: absolute;
-        right: 25.5%;
-        top: 34.5%;
+        right: 26%;
+        top: 33.5%;
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: repeat(3, 1fr);

@@ -206,7 +206,7 @@ void setup() {
 	if (!LittleFS.exists("/profiles")) {
 		LittleFS.mkdir("/profiles");
 	}
-	delay(10000);
+	delay(100);
 	Serial.println("Files on TinyPICO:");
   Serial.println("------------------------");
   listDir(LittleFS, "/", 3);  // List all files, 3 levels deep
@@ -293,7 +293,7 @@ void setupEndpoints() {
 			return;
 		}
 
-		DynamicJsonDocument doc(1024);
+		DynamicJsonDocument doc(2048);
 		JsonArray arr = doc.to<JsonArray>();
 
 		File file = root.openNextFile();
@@ -336,5 +336,4 @@ void setupEndpoints() {
 void loop() {
 	dnsServer.processNextRequest();  // I call this atleast every 10ms in my other projects (can be higher but I haven't tested it for stability)
 	delay(DNS_INTERVAL);             // seems to help with stability, if you are doing other things in the loop this may not be needed
-	listDir(LittleFS, "/", 3);
 }

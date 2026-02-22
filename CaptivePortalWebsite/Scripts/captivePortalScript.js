@@ -1,7 +1,10 @@
 
     let currentButton = '';
     let currentConfig = "New Configuration"
-    const config = {};
+    let config = {
+        name: "",
+        bindings: {}
+    };
     let profileList = [];
     let favorites = [];
     const MAX_PROFILES = 20;
@@ -9,6 +12,15 @@
 
     window.onload = function () {
         fetchProfileList();
+
+        document.querySelectorAll('.popup').forEach(popup => {
+            popup.addEventListener('click', function (e) {
+                // If user clicks the dark background (not the inner content)
+                if (e.target === popup) {
+                    popup.classList.remove('show');
+                }
+            });
+        });
     };
 
     function toggleDropdown() {
@@ -30,15 +42,15 @@
         toggleDropdown();
         switch(option) {
             case 'new':
-                openNewConfig()
+                //openNewConfig()
                 Object.keys(config).forEach(key => delete config[key]);
                 currentConfig = "New Configuration"
                 break;
             case 'load':
-                openPopup('profileSelector')
+                openPopup('profileSelector');
                 break;
             case 'save':
-                nameConfiguration();
+                openPopup('namingbox');
                 break;
         }
     }
@@ -46,7 +58,7 @@
     function openBindingPopup(buttonName) {
         currentButton = buttonName;
         document.getElementById('popupHeader').textContent = `Configure ${buttonName}`;
-        document.getElementById('actionInput').value = config[buttonName] || '';
+        document.getElementById('actionInput').value = config.bindings[buttonName] || '';
         openPopup('bindingbox');
     }
 
@@ -71,47 +83,54 @@
     function saveBinding() {
         const action = document.getElementById('actionInput').value;
         if (action) {
-            config[currentButton] = action;
+            config.bindings[currentButton] = action;
             console.log(`${currentButton} configured to: ${action}`);
         }
         closePopup('bindingbox');
     }
 
-    function nameConfiguration(){
-        document.getElementById('namingbox').classList.add('show');
-        //document.getElementById('nameInput').placeholder = currentConfig
-
-    }
-
     function saveConfiguration(){
-        const newName = document.getElementById("nameInput").value;
-        if (!newName) return alert("Enter a name.");
-
-        if (!profileList.includes(newName) && profileList.length >= MAX_PROFILES) {
-            return alert("Maximum of 20 profiles reached. Delete one first.");
+        const newName = document.getElementById("nameInput").value.trim();
+        if (!newName) {
+            alert("Enter a name.");
+            return;
         }
-        currentConfig = newName;
-        console.log(`Saved New Configuration as ${currentConfig}`)
-        sendConfigToTP();
-        closePopup('namingbox');
+        if (!profileList.includes(newName) && profileList.length >= MAX_PROFILES) {
+            alert("Maximum profiles reached.");
+            return;
+        }
+        currentProfile = newName;
+        config.name = newName;
+        sendConfigToTP()
+            .then(() => {
+                // Always re-sync from device
+                return fetchProfileList();
+            })
+            .then(() => {
+                closePopup('namingbox');
+                document.getElementById("nameInput").value = "";
+            })
+            .catch(err => {
+                alert("Failed to save profile.");
+                console.error(err);
+            });
     }
 
     function sendConfigToTP() {
-        fetch("/saveProfile", {
+        return fetch("/saveProfile", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                profile: currentConfig,
-                bindings: config
+                profile: currentProfile,
+                bindings: config.bindings
             })
         })
         .then(res => {
             if (!res.ok) throw new Error("Save failed");
-            console.log("Profile saved!");
-        })
-        .catch(err => console.error(err));
+            return res.json();
+        });
     }
 
     function loadSelectedProfile() {
@@ -119,26 +138,53 @@
         if (!profileName) return alert("Select a profile first.");
 
         loadConfigFromTP(profileName);
+        closePopup('profileSelector');
     }
 
+    //Kept seperate because the favorites will eventually need.
     function loadConfigFromTP(profileName) {
-        fetch(`/loadConfig?profile=${profileName}`)
-            .then(res => res.json())
-            .then(data => {
-                Object.assign(config, data);
-                applyConfigToUI();
-            })
-            .catch(err => console.error("Error loading config:", err));
+        fetch(`/loadConfig?profile=${encodeURIComponent(profileName)}`)
+        .then(res => {
+            if (!res.ok) throw new Error("Load failed");
+            return res.json();
+        })
+        .then(data => {
+            config.bindings = data;
+            currentProfile = profileName;
+            applyConfigToUI();
+        })
+        .catch(err => {
+            console.error("Load error:", err);
+        });
     }
 
     function deleteSelectedProfile() {
         const profileName = document.getElementById("profileDropdown").value;
-        if (!profileName) return alert("Select a profile first.");
 
-        deleteProfile(profileName);
-        closePopup()
+        if (!profileName) {
+            alert("Select a profile first.");
+            return;
+        }
+
+        fetch(`/deleteProfile?profile=${encodeURIComponent(profileName)}`, {
+            method: "DELETE"
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Delete failed");
+            return res.json();
+        })
+        .then(() => {
+            return fetchProfileList();
+        })
+        .then(() => {
+            closePopup('profileSelector');
+        })
+        .catch(err => {
+            console.error("Delete error:", err);
+        });
     }
 
+    //This may not be needed
     function deleteProfile(profileName) {
         fetch(`/deleteProfile?profile=${profileName}`, {
             method: "DELETE"
@@ -149,10 +195,10 @@
     }
 
     function applyConfigToUI() {
-        for (const button in config) {
+        for (const button in config.bindings) {
             const el = document.getElementById(button);
             if (el) {
-                el.value = config[button];
+                el.value = config.bindings[button];
             }
         }
     }
@@ -174,20 +220,27 @@
 
     function fetchProfileList() {
         fetch("/listProfiles")
-            .then(res => res.json())
-            .then(data => {
-                profileList = data.profiles || [];
-                favorites = data.favorites || [];
-
-                populateSelector();
-                console.log("Profiles loaded:", profileList);
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to fetch profiles");
+                return res.json();
             })
-            .catch(err => console.error("Failed loading profile list:", err));
+            .then(data => {
+                if (!Array.isArray(data)) {
+                    throw new Error("Invalid profile data");
+                }
+
+                profileList = data;
+                populateDropdown();
+            })
+            .catch(err => {
+                console.error("Profile list error:", err);
+                profileList = [];
+                populateDropdown();
+            });
     }
 
     function populateSelector() {
         const dropdown = document.getElementById("profileDropdown");
-
         dropdown.innerHTML = `<option value="">-- Select Profile --</option>`;
 
         profileList.forEach(profile => {
