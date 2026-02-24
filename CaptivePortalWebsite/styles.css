@@ -104,12 +104,17 @@
 
     /* Main Content */
     .container {
-        max-width: 1200px;
         margin: 2rem auto;
         padding: 1.5rem;
         display: flex;
         flex-direction: column;
         gap: 2rem;
+    }
+
+    .image-blocks {
+        display: grid;
+        grid-template-columns: 40% auto;
+        gap: 5%;
     }
 
     h1 {
@@ -176,9 +181,12 @@
     /* D-Pad */
     .dpad {
         position: absolute;
-        left: 18%;
-        top: 38%;
-        width: 12%;
+        display: grid;
+        grid-template-columns: auto auto auto;
+        grid-template-rows: auto auto auto;
+        left: 29%;
+        top: 64%;
+        width: 11%;
         aspect-ratio: 1 / 1;
     }
 
@@ -323,17 +331,17 @@
     }
 
     .rb {
-        right: 12%;
+        right: 16%;
         top: 12%;
     }
 
     .lt {
-        left: 6%;
+        left: 18%;
         top: 4%
     }
 
     .rt {
-        right: 6%;
+        right: 24%;
         top: 4%;
     }
 
@@ -476,9 +484,20 @@
             flex-direction: column;
         }
 
+        .container{
+            margin-top: 1rem;
+            padding: 1rem;
+        }
+
         h1 {
             font-size: 1.5rem;
             margin-bottom: 0%;
+        }
+
+        .image-blocks{
+            display: grid;
+            grid-template-columns: none;
+            gap: 8%;
         }
 
         .controller-container {

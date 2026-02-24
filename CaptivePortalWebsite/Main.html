@@ -29,47 +29,49 @@
     <!-- Main Content -->
     <div class="container">
         <h1>Controller Configuration Manager</h1>
-        <div class="controller-container">
-            <div class="controller-wrapper">
-                <div id="mouthpiece" class="mouthpiece">
-                    <div class="sip-puffs">
-                        <div id="SP1" class="sp-select" onclick="selectSipPuff('SP1')"></div>
-                        <div id="SP2" class="sp-select" onclick="selectSipPuff('SP2')"></div>
-                        <div id="SP3" class="sp-select" onclick="selectSipPuff('SP3')"></div>
+        <div class="image-blocks">
+            <div class="controller-container">
+                <div class="controller-wrapper">
+                    <div id="mouthpiece" class="mouthpiece">
+                        <div class="sip-puffs">
+                            <div id="SP1" class="sp-select" onclick="selectSipPuff('SP1')"></div>
+                            <div id="SP2" class="sp-select" onclick="selectSipPuff('SP2')"></div>
+                            <div id="SP3" class="sp-select" onclick="selectSipPuff('SP3')"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="controller-container">
-            <div class="controller-wrapper">
-                <div id="controller" class="controller">
-                    <div class="">
-                        <!-- Shoulder Buttons -->
-                        <div id="LT" class="shoulder-btn lt" onclick="openBindingPopup('LT')">LT</div>
-                        <div id="RT" class="shoulder-btn rt" onclick="openBindingPopup('RT')">RT</div>
-                        <div id="LB" class="shoulder-btn lb" onclick="openBindingPopup('LB')">LB</div>
-                        <div id="RB" class="shoulder-btn rb" onclick="openBindingPopup('RB')">RB</div>
+            <div class="controller-container">
+                <div class="controller-wrapper">
+                    <div id="controller" class="controller">
+                        <div class="">
+                            <!-- Shoulder Buttons -->
+                            <div id="LT" class="shoulder-btn lt" onclick="openBindingPopup('LT')">LT</div>
+                            <div id="RT" class="shoulder-btn rt" onclick="openBindingPopup('RT')">RT</div>
+                            <div id="LB" class="shoulder-btn lb" onclick="openBindingPopup('LB')">LB</div>
+                            <div id="RB" class="shoulder-btn rb" onclick="openBindingPopup('RB')">RB</div>
 
-                        <!-- D-Pad -->
-                        <div class="dpad">
-                            <div id="dpad-up" class="dpad-btn dpad-up" onclick="openBindingPopup('D-Pad Up')"></div>
-                            <div id="dpad-down" class="dpad-btn dpad-down" onclick="openBindingPopup('D-Pad Down')"></div>
-                            <div id="dpad-left" class="dpad-btn dpad-left" onclick="openBindingPopup('D-Pad Left')"></div>
-                            <div id="dpad-right" class="dpad-btn dpad-right" onclick="openBindingPopup('D-Pad Right')"></div>
-                        </div>
+                            <!-- D-Pad -->
+                            <div class="dpad">
+                                <div id="dpad-up" class="dpad-btn dpad-up" onclick="openBindingPopup('D-Pad Up')"></div>
+                                <div id="dpad-down" class="dpad-btn dpad-down" onclick="openBindingPopup('D-Pad Down')"></div>
+                                <div id="dpad-left" class="dpad-btn dpad-left" onclick="openBindingPopup('D-Pad Left')"></div>
+                                <div id="dpad-right" class="dpad-btn dpad-right" onclick="openBindingPopup('D-Pad Right')"></div>
+                            </div>
 
-                        <!-- Face Buttons -->
-                        <div class="face-buttons">
-                            <div id="face-y" class="face-btn btn-y invis" onclick="openBindingPopup('Y Button')">Y</div>
-                            <div id="face-b" class="face-btn btn-b invis" onclick="openBindingPopup('B Button')">B</div>
-                            <div id="face-a" class="face-btn btn-a invis" onclick="openBindingPopup('A Button')">A</div>
-                            <div id="face-x" class="face-btn btn-x invis" onclick="openBindingPopup('X Button')">X</div>
-                        </div>
+                            <!-- Face Buttons -->
+                            <div class="face-buttons">
+                                <div id="face-y" class="face-btn btn-y invis" onclick="openBindingPopup('Y Button')">Y</div>
+                                <div id="face-b" class="face-btn btn-b invis" onclick="openBindingPopup('B Button')">B</div>
+                                <div id="face-a" class="face-btn btn-a invis" onclick="openBindingPopup('A Button')">A</div>
+                                <div id="face-x" class="face-btn btn-x invis" onclick="openBindingPopup('X Button')">X</div>
+                            </div>
 
-                        <!-- Center Buttons -->
-                        <div class="center-buttons">
-                            <div id="face-select" class="center-btn" onclick="openBindingPopup('Select')"></div>
-                            <div id="face-start" class="center-btn" onclick="openBindingPopup('Start')"></div>
+                            <!-- Center Buttons -->
+                            <div class="center-buttons">
+                                <div id="face-select" class="center-btn" onclick="openBindingPopup('Select')"></div>
+                                <div id="face-start" class="center-btn" onclick="openBindingPopup('Start')"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -83,10 +85,8 @@
             <div class="popup-body">
                 <label for="actionInput">Assign Button:</label>
                 <select id="actionInput" class="popup-input">
-                    <option value="y">Y</option>
-                    <option value="b">B</option>
-                    <option value="a">A</option>
-                    <option value="x">X</option>
+                    <option value="sip">Sip</option>
+                    <option value="puff">Puff</option>
                 </select>
             </div>
             <div class="popup-buttons">
