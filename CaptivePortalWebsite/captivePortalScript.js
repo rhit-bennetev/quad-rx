@@ -1,9 +1,15 @@
 
     let currentButton = '';
+    let selectedSP = null;
     let currentConfig = "New Configuration"
+    let currentProfile = ""
     let config = {
         name: "",
-        bindings: {}
+        bindings: {
+            SP1: {},
+            SP2: {},
+            SP3: {}
+        }
     };
     let profileList = [];
     let favorites = [];
@@ -12,6 +18,8 @@
 
     window.onload = function () {
         fetchProfileList();
+
+        setBindings();
 
         document.querySelectorAll('.popup').forEach(popup => {
             popup.addEventListener('click', function (e) {
@@ -55,10 +63,10 @@
         }
     }
 
-    function openBindingPopup(buttonName) {
-        currentButton = buttonName;
-        document.getElementById('popupHeader').textContent = `Configure ${buttonName}`;
-        document.getElementById('actionInput').value = config.bindings[buttonName] || '';
+    function openBindingPopup(buttonId) {
+        currentButton = buttonId; //This will be used in the saveBinding function when they click save.
+        document.getElementById('popupHeader').textContent = `Configure ${buttonId} (${selectedSP || "No Sensor"})`;
+        document.getElementById('actionInput').value = config.bindings[selectedSP][buttonId] || '';
         openPopup('bindingbox');
     }
 
@@ -81,11 +89,21 @@
     }
 
     function saveBinding() {
-        const action = document.getElementById('actionInput').value;
-        if (action) {
-            config.bindings[currentButton] = action;
-            console.log(`${currentButton} configured to: ${action}`);
+        if (!selectedSP) {
+            alert("Select a Sip/Puff sensor first.");
+            return;
         }
+
+        const action = document.getElementById('actionInput').value;
+
+        if (!config.bindings[selectedSP]) {
+            config.bindings[selectedSP] = {};
+        }
+        config.bindings[selectedSP][currentButton] = action;
+
+        console.log(`${selectedSP} ${action} configured to: ${currentButton}`);
+        const button = document.getElementById(currentButton);
+        button.classList.add("configured");
         closePopup('bindingbox');
     }
 
@@ -149,9 +167,9 @@
             return res.json();
         })
         .then(data => {
-            config.bindings = data;
+            config.bindings = data.bindings;
             currentProfile = profileName;
-            applyConfigToUI();
+            applyConfigToUI()
         })
         .catch(err => {
             console.error("Load error:", err);
@@ -192,15 +210,6 @@
         .then(res => res.json())
         .then(data => console.log(data))
         .catch(err => console.error(err));
-    }
-
-    function applyConfigToUI() {
-        for (const button in config.bindings) {
-            const el = document.getElementById(button);
-            if (el) {
-                el.value = config.bindings[button];
-            }
-        }
     }
 
     function switchController(button){
@@ -251,13 +260,34 @@
         });
     }
 
-    function selectSipPuff(sipPuff){
-        const selectedInput = document.getElementById(sipPuff);
-        if(selectedInput.style.borderColor != "red"){
-            selectedInput.style.borderColor = "red"
+    function applyConfigToUI(){
+        document.querySelectorAll('[id]').forEach(el=>{
+            el.classList.remove("configured");
+        });
+
+        for(const sp in config.bindings){
+            for(const button in config.bindings[sp]){
+                const el = document.getElementById(button);
+                if(el){
+                    el.classList.add("configured");
+                }
+            }
+        }
+    }
+
+    function selectSipPuff(id){
+        document.querySelectorAll('.sp-select').forEach(el => {
+            el.classList.remove('sp-active');
+        });
+
+        const el = document.getElementById(id);
+        el.classList.toggle('sp-active');
+
+        if(selectedSP = id){
+            selectedSP = null;
         }
         else{
-            selectedInput.style.borderColor = "black"
+            selectedSP = id;
         }
     }
 

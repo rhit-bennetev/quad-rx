@@ -345,6 +345,18 @@
         top: 4%;
     }
 
+    .configured {
+        --glow-size: 1.8vmin;
+        --glow-spread: 0.5vmin;
+
+        box-shadow:
+            0 0 var(--glow-size) rgba(0,255,120,0.9),
+            0 0 calc(var(--glow-size) * 2) rgba(0,255,120,0.6),
+            0 0 calc(var(--glow-size) * 3) rgba(0,255,120,0.3);
+
+        transition: box-shadow 0.15s ease;
+    }
+
     /* Center Buttons */
     .center-buttons {
         position: absolute;
@@ -372,6 +384,7 @@
         transform: scale(1.1);
     }
 
+    /* Sip Puff Sensors */
     .sip-puffs {
         position: absolute;
         right: 23.8%;
@@ -396,6 +409,10 @@
 
     .sp-select:hover{
         border-color: #667eea;
+    }
+
+    .sp-select.sp-active {
+        border-color: red;
     }
 
     /* Popup */
@@ -515,5 +532,9 @@
 
         .popup-content{
             padding: 1rem;
+        }
+
+        .configured {
+            --glow-size: 2.5vmin;
         }
     }

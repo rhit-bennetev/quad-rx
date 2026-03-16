@@ -53,24 +53,24 @@
 
                             <!-- D-Pad -->
                             <div class="dpad">
-                                <div id="dpad-up" class="dpad-btn dpad-up" onclick="openBindingPopup('D-Pad Up')"></div>
-                                <div id="dpad-down" class="dpad-btn dpad-down" onclick="openBindingPopup('D-Pad Down')"></div>
-                                <div id="dpad-left" class="dpad-btn dpad-left" onclick="openBindingPopup('D-Pad Left')"></div>
-                                <div id="dpad-right" class="dpad-btn dpad-right" onclick="openBindingPopup('D-Pad Right')"></div>
+                                <div id="dpad-up" class="dpad-btn dpad-up" onclick="openBindingPopup('dpad-up')"></div>
+                                <div id="dpad-down" class="dpad-btn dpad-down" onclick="openBindingPopup('dpad-down')"></div>
+                                <div id="dpad-left" class="dpad-btn dpad-left" onclick="openBindingPopup('dpad-left')"></div>
+                                <div id="dpad-right" class="dpad-btn dpad-right" onclick="openBindingPopup('dpad-right')"></div>
                             </div>
 
                             <!-- Face Buttons -->
                             <div class="face-buttons">
-                                <div id="face-y" class="face-btn btn-y invis" onclick="openBindingPopup('Y Button')">Y</div>
-                                <div id="face-b" class="face-btn btn-b invis" onclick="openBindingPopup('B Button')">B</div>
-                                <div id="face-a" class="face-btn btn-a invis" onclick="openBindingPopup('A Button')">A</div>
-                                <div id="face-x" class="face-btn btn-x invis" onclick="openBindingPopup('X Button')">X</div>
+                                <div id="face-top" class="face-btn btn-y" onclick="openBindingPopup('face-top')">Y</div>
+                                <div id="face-right" class="face-btn btn-b" onclick="openBindingPopup('face-right')">B</div>
+                                <div id="face-bottom" class="face-btn btn-a" onclick="openBindingPopup('face-bottom')">A</div>
+                                <div id="face-left" class="face-btn btn-x" onclick="openBindingPopup('face-left')">X</div>
                             </div>
 
                             <!-- Center Buttons -->
                             <div class="center-buttons">
-                                <div id="face-select" class="center-btn" onclick="openBindingPopup('Select')"></div>
-                                <div id="face-start" class="center-btn" onclick="openBindingPopup('Start')"></div>
+                                <div id="select" class="center-btn" onclick="openBindingPopup('select')"></div>
+                                <div id="start" class="center-btn" onclick="openBindingPopup('start')"></div>
                             </div>
                         </div>
                     </div>
@@ -87,6 +87,9 @@
                 <select id="actionInput" class="popup-input">
                     <option value="sip">Sip</option>
                     <option value="puff">Puff</option>
+                    <option value="L-sip">Long Sip</option>
+                    <option value="L-puff">Long Puff</option>
+                    <option value="unbound">Unbound</option>
                 </select>
             </div>
             <div class="popup-buttons">
