@@ -124,7 +124,7 @@ void loadActiveProfile() { //i'll be honest i dont SUPER know how this works but
   String filename = profilePath(currentProfile);
   if (!LittleFS.exists(filename)) {
     Serial.println("No profile found, using defaults");
-    // fallback — mirror your hardcoded originals
+    // default configuration if user hasnt made one
     cfgSP1 = { {BUTTON_4, true}, {BUTTON_3, false}, true, true, (float)baseX, (float)thres };
     cfgSP2 = { {BUTTON_2, true}, {BUTTON_1, false}, true, true, (float)base,  (float)thres };
     return;
