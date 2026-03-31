@@ -97,7 +97,7 @@ if(bleGamepad.isConnected()){
     //handle AB sensor
     if(scaleAB.is_ready()){
       float val = scaleAB.read();
-        
+      Serial.println(val);
       if(val > thres && !pressA){
         bleGamepad.press(BUTTON_2);
         Serial.println("A pressed");          

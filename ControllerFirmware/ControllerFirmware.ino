@@ -8,6 +8,48 @@
 #include <esp_wifi.h>           //Used for mpdu_rx_disable android workaround
 #include <ArduinoJson.h>        //For handling profile Jsons
 #include <LittleFS.h>           //Replictes a file system on an ESP32 device.
+#include "HX711.h"
+#include <BleGamepad.h>
+
+//define pressure sensors
+HX711 scaleAB;
+HX711 scaleXY;
+HX711 scaleTrigger;
+
+//pins for clock, joystick X and Y, and pressure sensors
+//TODO read these from file during setup + support up to 5 pins for sensors
+const int CLK = 18;
+const int joystickY = 4;
+const int joystickX = 14;
+const int p2 = 15;
+const int p3 = 26;
+const int p4 = 25;
+
+const int key1 = 33;
+const int key2 = 32;
+
+int curState = 0;
+//define threshold to register an input 
+//difference from base state must be > base + 300000 or < base - 300000 (these numbers have no units, it is raw data from the pressure sensors. base sensor never deviates from ~2000000)
+const int base = 700000; 
+const int thres = 200000; 
+const int baseX = 3550000; 
+
+//center of joystick in potentiometer land
+const int CENTER_X_RAW = 1931;
+const int CENTER_Y_RAW = 1776;
+int curLight = 9999;
+//int lastLight = 0;
+const int HID_CENTER = 32768;
+
+BleGamepad bleGamepad;
+
+bool pressA = false;
+bool pressB = false;
+bool pressX = false;
+bool pressY = false;
+bool pressLT = false;
+bool pressRT = false;
 
 const int DNS_INTERVAL = 30;
 // Pre reading on the fundamentals of captive portals https://textslashplain.com/2022/06/24/captive-portals/
@@ -15,9 +57,6 @@ const int DNS_INTERVAL = 30;
 const char *ssid = "captive";  // FYI The SSID can't have a space in it.
 // const char * password = "12345678"; //Atleast 8 chars
 const char *password = NULL;  // no password
-
-const byte joystickX = 3;
-const byte joystickY = 4;
 
 #define MAX_CLIENTS 4   // ESP32 supports up to 10 but I have not tested it yet
 #define WIFI_CHANNEL 6  // 2.4ghz channel 6 https://en.wikipedia.org/wiki/List_of_WLAN_channels#2.4_GHz_(802.11b/g/n/ax)
@@ -28,28 +67,123 @@ const IPAddress subnetMask(255, 255, 255, 0);  // no need to change: https://avi
 
 const String localIPURL = "http://4.3.2.1";  // a string version of the local IP with http, used for redirecting clients to your webpage
 
-const char index_html[] PROGMEM = R"=====(
-  <!DOCTYPE html> <html>
-    <head>
-      <title>ESP32 Captive Portal</title>
-      <style>
-        body {background-color:#06cc13;}
-        h1 {color: white;}
-        h2 {color: white;}
-      </style>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-      <h1>Hello World!</h1>
-      <h2>This is a captive portal example. All requests will be redirected here </h2>
-    </body>
-  </html>
-)=====";
-
 String currentProfile = "default";
 
 String profilePath(String name) {
 	return "/profiles/" + name + ".json";
+}
+
+// Maps a sensor port + direction to a BLE button
+struct SensorBinding {
+  int buttonId;
+  bool isPuff;
+};
+
+struct SensorConfig {
+  SensorBinding puff;
+  SensorBinding sip;
+  bool hasPuff = false;
+  bool hasSip = false;
+  float base;
+  float threshold;
+};
+
+
+struct SensorConfig cfgSP1, cfgSP2, cfgSP3;
+
+int resolveButton(const char* name) {
+  // Map your button name strings to BLE button constants
+  if (strcmp(name, "A") == 0) return BUTTON_1;
+  if (strcmp(name, "B") == 0) return BUTTON_2;
+  if (strcmp(name, "X") == 0) return BUTTON_3;
+  if (strcmp(name, "Y") == 0) return BUTTON_4;
+  return -1; // unrecognized
+}
+
+void parseSensorBindings(JsonObject &sp, struct SensorConfig &cfg) { //relevant to loadActiveProfile, parses whatever config is current and stores it in the config structs
+  cfg.hasPuff = false;
+  cfg.hasSip  = false;
+
+  for (JsonPair kv : sp) {
+    const char* buttonName = kv.key().c_str();
+    const char* action     = kv.value().as<const char*>();
+    int btnId = resolveButton(buttonName);
+    if (btnId == -1) continue;
+
+    if (strcmp(action, "puff") == 0) {
+      cfg.puff    = { btnId, true };
+      cfg.hasPuff = true;
+    } else if (strcmp(action, "sip") == 0) {
+      cfg.sip    = { btnId, false };
+      cfg.hasSip = true;
+    }
+  }
+}
+
+void loadActiveProfile() { //i'll be honest i dont SUPER know how this works but from all the stuff ive looked at online + asking claude a bit it should be good.
+  String filename = profilePath(currentProfile);
+  if (!LittleFS.exists(filename)) {
+    Serial.println("No profile found, using defaults");
+    // fallback — mirror your hardcoded originals
+    cfgSP1 = { {BUTTON_4, true}, {BUTTON_3, false}, true, true, (float)baseX, (float)thres };
+    cfgSP2 = { {BUTTON_2, true}, {BUTTON_1, false}, true, true, (float)base,  (float)thres };
+    return;
+  }
+
+  File file = LittleFS.open(filename, "r");
+  DynamicJsonDocument doc(2048);
+  deserializeJson(doc, file);
+  file.close();
+
+  JsonObject bindings = doc["bindings"];
+
+  if (bindings.containsKey("SP1")) {
+    JsonObject sp1 = bindings["SP1"];
+    cfgSP1.base      = baseX;
+    cfgSP1.threshold = thres;
+    parseSensorBindings(sp1, cfgSP1);
+  }
+  if (bindings.containsKey("SP2")) {
+    JsonObject sp2 = bindings["SP2"];
+    cfgSP2.base      = base;
+    cfgSP2.threshold = thres;
+    parseSensorBindings(sp2, cfgSP2);
+  }
+  if (bindings.containsKey("SP3")) {
+    JsonObject sp3 = bindings["SP3"];
+    cfgSP3.base      = base;  // adjust if SP3 has a different base
+    cfgSP3.threshold = thres;
+    parseSensorBindings(sp3, cfgSP3);
+  }
+
+  Serial.println("Loaded profile: " + currentProfile);
+}
+
+void handleSensor(HX711 &scale, struct SensorConfig &cfg, bool &pressHigh, bool &pressLow) { //put this in its own function because it was ugly to have it all in loop()
+  if (!scale.is_ready()) return;
+  float val = scale.read();
+
+  // Puff 
+  if (cfg.hasPuff) {
+    if (val > (cfg.base + cfg.threshold) && !pressHigh) {
+      bleGamepad.press(cfg.puff.buttonId);
+      pressHigh = true;
+    } else if (val <= (cfg.base + cfg.threshold) && pressHigh) {
+      bleGamepad.release(cfg.puff.buttonId);
+      pressHigh = false;
+    }
+  }
+
+  // Sip 
+  if (cfg.hasSip) {
+    if (val < (cfg.base - cfg.threshold) && !pressLow) {
+      bleGamepad.press(cfg.sip.buttonId);
+      pressLow = true;
+    } else if (val >= (cfg.base - cfg.threshold) && pressLow) {
+      bleGamepad.release(cfg.sip.buttonId);
+      pressLow = false;
+    }
+  }
 }
 
 
@@ -179,19 +313,22 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
         }
         file = root.openNextFile();
     }
+
+		Serial.print("Current Profile: ");
+		Serial.println(currentProfile);
 }
+
+BleGamepadConfiguration config;
 
 void setup() {
 	// Set the transmit buffer size for the Serial object and start it with a baud rate of 115200.
 	Serial.setTxBufferSize(1024);
 	Serial.begin(115200);
-
 	// Wait for the Serial object to become available.
 	while (!Serial)
 		;
 
 	// Print a welcome message to the Serial port.
-	Serial.println("\n\nCaptive Test, V0.5.0 compiled " __DATE__ " " __TIME__ " by CD_FER");  //__DATE__ is provided by the platformio ide
 	Serial.printf("%s-%d\n\r", ESP.getChipModel(), ESP.getChipRevision());
 
 	startSoftAccessPoint(ssid, password, localIP, gatewayIP);
@@ -216,6 +353,25 @@ void setup() {
 
 	setUpWebserver(server, localIP);
 	server.begin();
+
+  config.setControllerType(CONTROLLER_TYPE_GAMEPAD);
+  //config.setVid(0x045e);  
+  //config.setPid(0x028e);  
+
+  bleGamepad.begin(&config);
+  
+  //Serial.println("Initializing HX711 sensors...");
+  scaleAB.begin(p2, CLK);
+  delay(100);
+  scaleXY.begin(p3, CLK);
+  delay(100);
+  scaleTrigger.begin(p4, CLK);
+  delay(100);
+
+	pinMode(key1, INPUT_PULLUP);
+	pinMode(key2, INPUT_PULLUP);
+
+	loadActiveProfile();
 
 	Serial.print("\n");
 	Serial.print("Startup Time:");  
@@ -258,6 +414,8 @@ void setupEndpoints() {
 
 		  Serial.println("Saved: " + filename);
 
+			loadActiveProfile();
+			
 		  request->send(200, "application/json", "{\"status\":\"Profile saved\"}");
 	  });
 
@@ -281,6 +439,8 @@ void setupEndpoints() {
 		file.close();
 
 		currentProfile = profileName;
+
+		loadActiveProfile();
 
 		request->send(200, "application/json", json);
 	});
@@ -333,7 +493,105 @@ void setupEndpoints() {
 	});
 }
 
+int lastState = -1;
 void loop() {
-	dnsServer.processNextRequest();  // I call this atleast every 10ms in my other projects (can be higher but I haven't tested it for stability)
-	delay(DNS_INTERVAL);             // seems to help with stability, if you are doing other things in the loop this may not be needed
+	//listDir(LittleFS, "/", 3);
+	
+	int switchKey = digitalRead(key1);
+    if (switchKey == LOW) {
+        curState = !curState;
+        delay(500); // debounce
+    }
+	int switchKey2 = digitalRead(key2);
+		if(switchKey2 == LOW){
+			listDir(LittleFS, "/", 3);
+			delay(100);
+		}
+    if (curState != lastState) {
+        lastState = curState;
+        switch (curState) {
+            case 0:
+                esp_wifi_stop();
+								Serial.println("WIFI OFF");
+                break;
+            case 1:
+                esp_wifi_start();
+								Serial.println("WIFI ON");
+                break;
+        }
+    }
+
+	if(curState == 1){
+		dnsServer.processNextRequest();  // I call this atleast every 10ms in my other projects (can be higher but I haven't tested it for stability)
+		delay(DNS_INTERVAL);
+	}
+
+	if(bleGamepad.isConnected()){     
+  //read from joystick
+uint16_t rawx = analogRead(joystickX);
+uint16_t rawy = analogRead(joystickY);
+
+rawx = constrain(rawx, 750, 3500);
+rawy = constrain(rawy, 750, 3500);
+
+// X is inverted (left=4095, right=0), so flip it
+uint16_t mappedX = map(rawx, 3500, 750, 0, 32767); //six seven
+// Y: up=0, down=4095 — joy.cpl wants up=0 so no flip needed
+uint16_t mappedY = map(rawy, 750, 3500, 0, 32767);
+
+
+bleGamepad.setX(mappedX);
+bleGamepad.setY(mappedY);
+
+  //   //handle AB sensor
+  //   if(scaleAB.is_ready()){
+  //     float val = scaleAB.read();
+  //     if(val > (thres + base) && !pressA){
+  //       //Serial.println("A press");
+  //       bleGamepad.press(BUTTON_2);    
+  //       pressA = true;
+  //     }
+  //     else if(val < (base - thres) && !pressB){
+  //       bleGamepad.press(BUTTON_1);
+  //     //Serial.println("B pressed");
+  //       pressB = true;
+  //     }
+  //     else if(val < (thres + base) && pressA){
+  //       bleGamepad.release(BUTTON_2);
+  //       pressA = false;
+  //     }
+  //     else if(val > (base - thres) && pressB){
+  //       bleGamepad.release(BUTTON_1);
+  //       pressB = false;
+  //     }
+  //   }
+  //   //handle XY sensor  
+  //   if(scaleXY.is_ready()){
+  //     float val = scaleXY.read();
+	// 		//Serial.println(val);
+  //     if(val > (thres + baseX) && !pressX ){
+  //       //Serial.println("A press");
+  //       bleGamepad.press(BUTTON_4);    
+  //       pressX = true;
+  //     }
+  //     else if(val < (baseX - thres) && !pressY){
+  //       bleGamepad.press(BUTTON_3);
+  //     //Serial.println("B pressed");
+  //       pressY = true;
+  //     }
+  //     else if(val < (thres + baseX) && pressX){
+  //       bleGamepad.release(BUTTON_4);
+  //       pressX = false;
+  //     }
+  //     else if(val > (baseX - thres) && pressY){
+  //       bleGamepad.release(BUTTON_3);
+  //       pressY = false;
+  //     }
+  //   }
+  // }
+
+handleSensor(scaleAB,      cfgSP2, pressA, pressB);
+handleSensor(scaleXY,      cfgSP1, pressX, pressY);
+handleSensor(scaleTrigger, cfgSP3, pressLT, pressRT);
+	}
 }
