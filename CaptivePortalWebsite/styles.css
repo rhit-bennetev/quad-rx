@@ -4,6 +4,12 @@
         box-sizing: border-box;
     }
 
+    :root {
+        --sp1-color: #ff4d4d;
+        --sp2-color: #4da6ff;
+        --sp3-color: #4dff88;
+    }
+
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: #667eea;
@@ -346,14 +352,14 @@
     }
 
     .configured {
-        --glow-size: 1.8vmin;
-        --glow-spread: 0.5vmin;
+        --glow-size: 2vmin;
 
         box-shadow:
-            0 0 var(--glow-size) rgba(0,255,120,0.9),
-            0 0 calc(var(--glow-size) * 2) rgba(0,255,120,0.6),
-            0 0 calc(var(--glow-size) * 3) rgba(0,255,120,0.3);
-
+            0 0 var(--glow-size) var(--glow-color),
+            0 0 calc(var(--glow-size) * 0.5) var(--glow-color),
+            0 0 calc(var(--glow-size) * 2) var(--glow-color),
+            0 0 calc(var(--glow-size) * 3) var(--glow-color);
+        
         transition: box-shadow 0.15s ease;
     }
 
@@ -397,6 +403,14 @@
         aspect-ratio: 1 / 1;
     }
 
+    #SP1.sp-active { border-color: var(--sp1-color); }
+    #SP2.sp-active { border-color: var(--sp2-color); }
+    #SP3.sp-active { border-color: var(--sp3-color); }
+
+    .sp1-bind { --glow-color: var(--sp1-color); }
+    .sp2-bind { --glow-color: var(--sp2-color); }
+    .sp3-bind { --glow-color: var(--sp3-color); }
+
     .sp-select {
         background-color: transparent;
         border: .5em solid black;
@@ -413,6 +427,22 @@
 
     .sp-select.sp-active {
         border-color: red;
+    }
+
+    /* Disable Other Sensor Glows When Editing */
+    body.sp1-active .sp2-bind,
+    body.sp1-active .sp3-bind {
+        box-shadow: none;
+    }
+
+    body.sp2-active .sp1-bind,
+    body.sp2-active .sp3-bind {
+        box-shadow: none;
+    }
+
+    body.sp3-active .sp1-bind,
+    body.sp3-active .sp2-bind {
+        box-shadow: none;
     }
 
     /* Popup */
