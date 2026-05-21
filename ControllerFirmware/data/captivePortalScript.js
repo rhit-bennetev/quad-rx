@@ -17,9 +17,7 @@
     const MAX_FAVORITES = 3
 
     window.onload = function () {
-        fetchProfileList();
-
-        setBindings();
+        //fetchProfileList();
 
         document.querySelectorAll('.popup').forEach(popup => {
             popup.addEventListener('click', function (e) {
@@ -66,7 +64,12 @@
     function openBindingPopup(buttonId) {
         currentButton = buttonId; //This will be used in the saveBinding function when they click save.
         document.getElementById('popupHeader').textContent = `Configure ${buttonId} (${selectedSP || "No Sensor"})`;
-        document.getElementById('actionInput').value = config.bindings[selectedSP][buttonId] || '';
+        try {
+            document.getElementById('actionInput').value = config.bindings[selectedSP][buttonId] || '';
+        } catch (error) {
+             alert("Select a Sip/Puff sensor first.");
+             return;
+        }
         openPopup('bindingbox');
     }
 
@@ -104,6 +107,9 @@
         console.log(`${selectedSP} ${action} configured to: ${currentButton}`);
         const button = document.getElementById(currentButton);
         button.classList.add("configured");
+        if(selectedSP === "SP1") button.classList.add("sp1-bind");
+        if(selectedSP === "SP2") button.classList.add("sp2-bind");
+        if(selectedSP === "SP3") button.classList.add("sp3-bind");
         closePopup('bindingbox');
     }
 
@@ -270,6 +276,9 @@
                 const el = document.getElementById(button);
                 if(el){
                     el.classList.add("configured");
+                    if(sp === "SP1") el.classList.add("sp1-bind");
+                    if(sp === "SP2") el.classList.add("sp2-bind");
+                    if(sp === "SP3") el.classList.add("sp3-bind");
                 }
             }
         }
@@ -281,13 +290,17 @@
         });
 
         const el = document.getElementById(id);
-        el.classList.toggle('sp-active');
+        document.body.classList.remove("sp1-active","sp2-active","sp3-active");
 
-        if(selectedSP = id){
+        if(selectedSP == id){
             selectedSP = null;
         }
         else{
             selectedSP = id;
+            el.classList.toggle('sp-active');
+            if (id === "SP1") document.body.classList.add("sp1-active");
+            if (id === "SP2") document.body.classList.add("sp2-active");
+            if (id === "SP3") document.body.classList.add("sp3-active");
         }
     }
 

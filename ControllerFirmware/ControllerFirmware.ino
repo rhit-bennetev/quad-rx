@@ -1,5 +1,3 @@
-#include <Arduino.h>  //not needed in the arduino ide
-
 // Captive Portal
 #include <WiFi.h>
 #include <AsyncTCP.h>  //https://github.com/me-no-dev/AsyncTCP using the latest dev version from @me-no-dev
@@ -17,7 +15,6 @@ HX711 scaleXY;
 HX711 scaleTrigger;
 
 //pins for clock, joystick X and Y, and pressure sensors
-//TODO read these from file during setup + support up to 5 pins for sensors
 const int CLK = 18;
 const int joystickY = 4;
 const int joystickX = 14;
@@ -30,17 +27,14 @@ const int key2 = 32;
 
 int curState = 0;
 //define threshold to register an input 
-//difference from base state must be > base + 300000 or < base - 300000 (these numbers have no units, it is raw data from the pressure sensors. base sensor never deviates from ~2000000)
+//difference from base state must be > base + thres or < base - thres. some fine tuning may be required due to differences in manufactering 
 const int base = 700000; 
-const int thres = 200000; 
+const int thres = 400000; 
 const int baseX = 3550000; 
 
 //center of joystick in potentiometer land
 const int CENTER_X_RAW = 1931;
 const int CENTER_Y_RAW = 1776;
-int curLight = 9999;
-//int lastLight = 0;
-const int HID_CENTER = 32768;
 
 BleGamepad bleGamepad;
 
@@ -126,7 +120,7 @@ void loadActiveProfile() { //i'll be honest i dont SUPER know how this works but
     Serial.println("No profile found, using defaults");
     // default configuration if user hasnt made one
     cfgSP1 = { {BUTTON_4, true}, {BUTTON_3, false}, true, true, (float)baseX, (float)thres };
-    cfgSP2 = { {BUTTON_2, true}, {BUTTON_1, false}, true, true, (float)base,  (float)thres };
+    cfgSP2 = { {BUTTON_1, true}, {BUTTON_2, false}, true, true, (float)base,  (float)thres };
     return;
   }
 
@@ -522,7 +516,7 @@ void loop() {
     }
 
 	if(curState == 1){
-		dnsServer.processNextRequest();  // I call this atleast every 10ms in my other projects (can be higher but I haven't tested it for stability)
+		dnsServer.processNextRequest();  
 		delay(DNS_INTERVAL);
 	}
 
@@ -543,54 +537,7 @@ uint16_t mappedY = map(rawy, 750, 3500, 0, 32767);
 bleGamepad.setX(mappedX);
 bleGamepad.setY(mappedY);
 
-  //   //handle AB sensor
-  //   if(scaleAB.is_ready()){
-  //     float val = scaleAB.read();
-  //     if(val > (thres + base) && !pressA){
-  //       //Serial.println("A press");
-  //       bleGamepad.press(BUTTON_2);    
-  //       pressA = true;
-  //     }
-  //     else if(val < (base - thres) && !pressB){
-  //       bleGamepad.press(BUTTON_1);
-  //     //Serial.println("B pressed");
-  //       pressB = true;
-  //     }
-  //     else if(val < (thres + base) && pressA){
-  //       bleGamepad.release(BUTTON_2);
-  //       pressA = false;
-  //     }
-  //     else if(val > (base - thres) && pressB){
-  //       bleGamepad.release(BUTTON_1);
-  //       pressB = false;
-  //     }
-  //   }
-  //   //handle XY sensor  
-  //   if(scaleXY.is_ready()){
-  //     float val = scaleXY.read();
-	// 		//Serial.println(val);
-  //     if(val > (thres + baseX) && !pressX ){
-  //       //Serial.println("A press");
-  //       bleGamepad.press(BUTTON_4);    
-  //       pressX = true;
-  //     }
-  //     else if(val < (baseX - thres) && !pressY){
-  //       bleGamepad.press(BUTTON_3);
-  //     //Serial.println("B pressed");
-  //       pressY = true;
-  //     }
-  //     else if(val < (thres + baseX) && pressX){
-  //       bleGamepad.release(BUTTON_4);
-  //       pressX = false;
-  //     }
-  //     else if(val > (baseX - thres) && pressY){
-  //       bleGamepad.release(BUTTON_3);
-  //       pressY = false;
-  //     }
-  //   }
-  // }
-
-handleSensor(scaleAB,      cfgSP2, pressA, pressB);
+handleSensor(scaleAB,      cfgSP2, pressB, pressA);
 handleSensor(scaleXY,      cfgSP1, pressX, pressY);
 handleSensor(scaleTrigger, cfgSP3, pressLT, pressRT);
 	}
