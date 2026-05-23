@@ -1,0 +1,133 @@
+Plot Report
+-----------
+
+Report Written:     19:05 Friday, May 22, 2026
+Design Path:        C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Daughterboard_better.pcb
+Design Title:       
+Created:            1/16/2026 3:17:17 PM
+Last Saved:         5/22/2026 7:00:21 PM
+Editing Time:       15541 min
+Units:              mm (precision 2)
+
+
+Device Settings
+===============
+
+
+Gerber Settings
+===============
+
+    Leading zero suppression.
+    G01 assumed throughout.
+    Line termination <*> <CR> <LF>.
+    3.5 format absolute inches.
+    Format commands defined in Gerber file.
+    Aperture table defined in Gerber file.
+    Hardware arcs allowed.
+
+
+Drill Settings
+==============
+
+    Excellon Format 2
+    Format 3.5 absolute in mm.
+    Zero suppression Leading
+
+
+
+Plots Output
+============
+
+    Plot Job: "C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Daughterboard_better.mop"
+
+
+Gerber Output
+=============
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Daughterboard_better - Top Gerber.gbr
+
+    Layers:
+    --------------
+    Top Copper
+
+    D-Code Shape  (thou)
+    -----------------------------
+    D10    Round 50.00
+    D11    Round 48.00
+    D12    Round 15.00
+    D13    Round 25.00
+    D14    Round 60.00
+    D15    Square 60.00
+    D16    Octagon 60.00
+    D17    Oval 60.00 X 120.00
+
+Gerber Output
+=============
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Daughterboard_better - Bottom Gerber.gbr
+
+    Layers:
+    -----------------
+    Bottom Copper
+
+    D-Code Shape  (thou)
+    -----------------------------
+    D10    Round 50.00
+    D11    Round 48.00
+    D12    Round 15.00
+    D13    Round 25.00
+    D14    Round 60.00
+    D15    Square 60.00
+    D16    Octagon 60.00
+    D17    Oval 60.00 X 120.00
+
+NC Drill Output
+===============
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Daughterboard_better - Drill Excellon.drl
+
+    Output:
+    ---------------------------
+    Plated Round Drill Holes
+    Plated Slots
+    Plated Board Outlines
+
+    Tool  Size           Count   ID
+    --------------------------------------
+    T001  0.02400 inches 16    A
+    T002  0.03500 inches 4     B
+    T003  0.04000 inches 28    F
+    --------------------------------------
+    Total                48
+    --------------------------------------
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Daughterboard_better - Drill Excellon (Unplated).drl
+
+    Output:
+    -----------------------------
+    Unplated Round Drill Holes
+    Unplated Slots
+    Unplated Board Outlines
+
+    Tool  Size           Count   ID
+    --------------------------------------
+    T001  0.02500 inches 1
+    --------------------------------------
+    Total                1
+    --------------------------------------
+
+
+Gerber Output
+=============
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Daughterboard_better - Outline.gbr
+
+    Layers:
+    ------------------
+    Board Outlines
+
+    D-Code Shape  (thou)
+    -----------------------
+    D18    Round 5.00
+
+End Of Report.

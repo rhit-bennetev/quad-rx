@@ -26,11 +26,11 @@ const int key1 = 33;
 const int key2 = 32;
 
 int curState = 0;
-//define threshold to register an input 
-//difference from base state must be > base + thres or < base - thres. some fine tuning may be required due to differences in manufactering 
-const int base = 700000; 
-const int thres = 400000; 
-const int baseX = 3550000; 
+//define threshold to register an input
+//difference from base state must be > base + thres or < base - thres. some fine tuning may be required due to differences in manufactering
+const int base = 700000;
+const int thres = 400000;
+const int baseX = 3550000;
 
 //center of joystick in potentiometer land
 const int CENTER_X_RAW = 1931;
@@ -69,115 +69,115 @@ String profilePath(String name) {
 
 // Maps a sensor port + direction to a BLE button
 struct SensorBinding {
-  int buttonId;
-  bool isPuff;
+	int buttonId;
+	bool isPuff;
 };
 
 struct SensorConfig {
-  SensorBinding puff;
-  SensorBinding sip;
-  bool hasPuff = false;
-  bool hasSip = false;
-  float base;
-  float threshold;
+	SensorBinding puff;
+	SensorBinding sip;
+	bool hasPuff = false;
+	bool hasSip = false;
+	float base;
+	float threshold;
 };
 
 
 struct SensorConfig cfgSP1, cfgSP2, cfgSP3;
 
-int resolveButton(const char* name) {
-  // Map your button name strings to BLE button constants
-  if (strcmp(name, "A") == 0) return BUTTON_1;
-  if (strcmp(name, "B") == 0) return BUTTON_2;
-  if (strcmp(name, "X") == 0) return BUTTON_3;
-  if (strcmp(name, "Y") == 0) return BUTTON_4;
-  return -1; // unrecognized
+int resolveButton(const char *name) {
+	// Map your button name strings to BLE button constants
+	if (strcmp(name, "A") == 0) return BUTTON_1;
+	if (strcmp(name, "B") == 0) return BUTTON_2;
+	if (strcmp(name, "X") == 0) return BUTTON_3;
+	if (strcmp(name, "Y") == 0) return BUTTON_4;
+	return -1;  // unrecognized
 }
 
-void parseSensorBindings(JsonObject &sp, struct SensorConfig &cfg) { //relevant to loadActiveProfile, parses whatever config is current and stores it in the config structs
-  cfg.hasPuff = false;
-  cfg.hasSip  = false;
+void parseSensorBindings(JsonObject &sp, struct SensorConfig &cfg) {  //relevant to loadActiveProfile, parses whatever config is current and stores it in the config structs
+	cfg.hasPuff = false;
+	cfg.hasSip = false;
 
-  for (JsonPair kv : sp) {
-    const char* buttonName = kv.key().c_str();
-    const char* action     = kv.value().as<const char*>();
-    int btnId = resolveButton(buttonName);
-    if (btnId == -1) continue;
+	for (JsonPair kv : sp) {
+		const char *buttonName = kv.key().c_str();
+		const char *action = kv.value().as<const char *>();
+		int btnId = resolveButton(buttonName);
+		if (btnId == -1) continue;
 
-    if (strcmp(action, "puff") == 0) {
-      cfg.puff    = { btnId, true };
-      cfg.hasPuff = true;
-    } else if (strcmp(action, "sip") == 0) {
-      cfg.sip    = { btnId, false };
-      cfg.hasSip = true;
-    }
-  }
+		if (strcmp(action, "puff") == 0) {
+			cfg.puff = { btnId, true };
+			cfg.hasPuff = true;
+		} else if (strcmp(action, "sip") == 0) {
+			cfg.sip = { btnId, false };
+			cfg.hasSip = true;
+		}
+	}
 }
 
-void loadActiveProfile() { //i'll be honest i dont SUPER know how this works but from all the stuff ive looked at online + asking claude a bit it should be good.
-  String filename = profilePath(currentProfile);
-  if (!LittleFS.exists(filename)) {
-    Serial.println("No profile found, using defaults");
-    // default configuration if user hasnt made one
-    cfgSP1 = { {BUTTON_4, true}, {BUTTON_3, false}, true, true, (float)baseX, (float)thres };
-    cfgSP2 = { {BUTTON_1, true}, {BUTTON_2, false}, true, true, (float)base,  (float)thres };
-    return;
-  }
+void loadActiveProfile() {  //i'll be honest i dont SUPER know how this works but from all the stuff ive looked at online + asking claude a bit it should be good.
+	String filename = profilePath(currentProfile);
+	if (!LittleFS.exists(filename)) {
+		Serial.println("No profile found, using defaults");
+		// default configuration if user hasnt made one
+		cfgSP1 = { { BUTTON_4, true }, { BUTTON_3, false }, true, true, (float)baseX, (float)thres };
+		cfgSP2 = { { BUTTON_1, true }, { BUTTON_2, false }, true, true, (float)base, (float)thres };
+		return;
+	}
 
-  File file = LittleFS.open(filename, "r");
-  DynamicJsonDocument doc(2048);
-  deserializeJson(doc, file);
-  file.close();
+	File file = LittleFS.open(filename, "r");
+	DynamicJsonDocument doc(2048);
+	deserializeJson(doc, file);
+	file.close();
 
-  JsonObject bindings = doc["bindings"];
+	JsonObject bindings = doc["bindings"];
 
-  if (bindings.containsKey("SP1")) {
-    JsonObject sp1 = bindings["SP1"];
-    cfgSP1.base      = baseX;
-    cfgSP1.threshold = thres;
-    parseSensorBindings(sp1, cfgSP1);
-  }
-  if (bindings.containsKey("SP2")) {
-    JsonObject sp2 = bindings["SP2"];
-    cfgSP2.base      = base;
-    cfgSP2.threshold = thres;
-    parseSensorBindings(sp2, cfgSP2);
-  }
-  if (bindings.containsKey("SP3")) {
-    JsonObject sp3 = bindings["SP3"];
-    cfgSP3.base      = base;  // adjust if SP3 has a different base
-    cfgSP3.threshold = thres;
-    parseSensorBindings(sp3, cfgSP3);
-  }
+	if (bindings.containsKey("SP1")) {
+		JsonObject sp1 = bindings["SP1"];
+		cfgSP1.base = baseX;
+		cfgSP1.threshold = thres;
+		parseSensorBindings(sp1, cfgSP1);
+	}
+	if (bindings.containsKey("SP2")) {
+		JsonObject sp2 = bindings["SP2"];
+		cfgSP2.base = base;
+		cfgSP2.threshold = thres;
+		parseSensorBindings(sp2, cfgSP2);
+	}
+	if (bindings.containsKey("SP3")) {
+		JsonObject sp3 = bindings["SP3"];
+		cfgSP3.base = base;  // adjust if SP3 has a different base
+		cfgSP3.threshold = thres;
+		parseSensorBindings(sp3, cfgSP3);
+	}
 
-  Serial.println("Loaded profile: " + currentProfile);
+	Serial.println("Loaded profile: " + currentProfile);
 }
 
-void handleSensor(HX711 &scale, struct SensorConfig &cfg, bool &pressHigh, bool &pressLow) { //put this in its own function because it was ugly to have it all in loop()
-  if (!scale.is_ready()) return;
-  float val = scale.read();
+void handleSensor(HX711 &scale, struct SensorConfig &cfg, bool &pressHigh, bool &pressLow) {  //put this in its own function because it was ugly to have it all in loop()
+	if (!scale.is_ready()) return;
+	float val = scale.read();
 
-  // Puff 
-  if (cfg.hasPuff) {
-    if (val > (cfg.base + cfg.threshold) && !pressHigh) {
-      bleGamepad.press(cfg.puff.buttonId);
-      pressHigh = true;
-    } else if (val <= (cfg.base + cfg.threshold) && pressHigh) {
-      bleGamepad.release(cfg.puff.buttonId);
-      pressHigh = false;
-    }
-  }
+	// Puff
+	if (cfg.hasPuff) {
+		if (val > (cfg.base + cfg.threshold) && !pressHigh) {
+			bleGamepad.press(cfg.puff.buttonId);
+			pressHigh = true;
+		} else if (val <= (cfg.base + cfg.threshold) && pressHigh) {
+			bleGamepad.release(cfg.puff.buttonId);
+			pressHigh = false;
+		}
+	}
 
-  // Sip 
-  if (cfg.hasSip) {
-    if (val < (cfg.base - cfg.threshold) && !pressLow) {
-      bleGamepad.press(cfg.sip.buttonId);
-      pressLow = true;
-    } else if (val >= (cfg.base - cfg.threshold) && pressLow) {
-      bleGamepad.release(cfg.sip.buttonId);
-      pressLow = false;
-    }
-  }
+	// Sip
+	if (cfg.hasSip) {
+		if (val < (cfg.base - cfg.threshold) && !pressLow) {
+			bleGamepad.press(cfg.sip.buttonId);
+			pressLow = true;
+		} else if (val >= (cfg.base - cfg.threshold) && pressLow) {
+			bleGamepad.release(cfg.sip.buttonId);
+			pressLow = false;
+		}
+	}
 }
 
 
@@ -279,37 +279,37 @@ void setUpWebserver(AsyncWebServer &server, const IPAddress &localIP) {
 }
 
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
-    Serial.printf("Listing directory: %s\n", dirname);
+	Serial.printf("Listing directory: %s\n", dirname);
 
-    File root = fs.open(dirname);
-    if (!root) {
-        Serial.println("Failed to open directory");
-        return;
-    }
-    if (!root.isDirectory()) {
-        Serial.println("Not a directory");
-        return;
-    }
+	File root = fs.open(dirname);
+	if (!root) {
+		Serial.println("Failed to open directory");
+		return;
+	}
+	if (!root.isDirectory()) {
+		Serial.println("Not a directory");
+		return;
+	}
 
-    File file = root.openNextFile();
-    while (file) {
-        if (file.isDirectory()) {
-            Serial.print("  DIR : ");
-            Serial.println(file.name());
-            if (levels) {
-                listDir(fs, file.path(), levels - 1);
-            }
-        } else {
-            Serial.print("  FILE: ");
-            Serial.print(file.name());
-            Serial.print("  SIZE: ");
-            Serial.println(file.size());
-        }
-        file = root.openNextFile();
-    }
+	File file = root.openNextFile();
+	while (file) {
+		if (file.isDirectory()) {
+			Serial.print("  DIR : ");
+			Serial.println(file.name());
+			if (levels) {
+				listDir(fs, file.path(), levels - 1);
+			}
+		} else {
+			Serial.print("  FILE: ");
+			Serial.print(file.name());
+			Serial.print("  SIZE: ");
+			Serial.println(file.size());
+		}
+		file = root.openNextFile();
+	}
 
-		Serial.print("Current Profile: ");
-		Serial.println(currentProfile);
+	Serial.print("Current Profile: ");
+	Serial.println(currentProfile);
 }
 
 BleGamepadConfiguration config;
@@ -339,28 +339,28 @@ void setup() {
 	}
 	delay(100);
 	Serial.println("Files on TinyPICO:");
-  Serial.println("------------------------");
-  listDir(LittleFS, "/", 3);  // List all files, 3 levels deep
-  Serial.println("------------------------\n");
+	Serial.println("------------------------");
+	listDir(LittleFS, "/", 3);  // List all files, 3 levels deep
+	Serial.println("------------------------\n");
 
 	setupEndpoints();
 
 	setUpWebserver(server, localIP);
 	server.begin();
 
-  config.setControllerType(CONTROLLER_TYPE_GAMEPAD);
-  //config.setVid(0x045e);  
-  //config.setPid(0x028e);  
+	config.setControllerType(CONTROLLER_TYPE_GAMEPAD);
+	//config.setVid(0x045e);
+	//config.setPid(0x028e);
 
-  bleGamepad.begin(&config);
-  
-  //Serial.println("Initializing HX711 sensors...");
-  scaleAB.begin(p2, CLK);
-  delay(100);
-  scaleXY.begin(p3, CLK);
-  delay(100);
-  scaleTrigger.begin(p4, CLK);
-  delay(100);
+	bleGamepad.begin(&config);
+
+	//Serial.println("Initializing HX711 sensors...");
+	scaleAB.begin(p2, CLK);
+	delay(100);
+	scaleXY.begin(p3, CLK);
+	delay(100);
+	scaleTrigger.begin(p4, CLK);
+	delay(100);
 
 	pinMode(key1, INPUT_PULLUP);
 	pinMode(key2, INPUT_PULLUP);
@@ -368,7 +368,7 @@ void setup() {
 	loadActiveProfile();
 
 	Serial.print("\n");
-	Serial.print("Startup Time:");  
+	Serial.print("Startup Time:");
 	Serial.println(millis());
 	Serial.print("\n");
 }
@@ -408,8 +408,8 @@ void setupEndpoints() {
 
 		  Serial.println("Saved: " + filename);
 
-			loadActiveProfile();
-			
+		  loadActiveProfile();
+
 		  request->send(200, "application/json", "{\"status\":\"Profile saved\"}");
 	  });
 
@@ -490,55 +490,55 @@ void setupEndpoints() {
 int lastState = -1;
 void loop() {
 	//listDir(LittleFS, "/", 3);
-	
-	int switchKey = digitalRead(key1);
-    if (switchKey == LOW) {
-        curState = !curState;
-        delay(500); // debounce
-    }
-	int switchKey2 = digitalRead(key2);
-		if(switchKey2 == LOW){
-			listDir(LittleFS, "/", 3);
-			delay(100);
-		}
-    if (curState != lastState) {
-        lastState = curState;
-        switch (curState) {
-            case 0:
-                esp_wifi_stop();
-								Serial.println("WIFI OFF");
-                break;
-            case 1:
-                esp_wifi_start();
-								Serial.println("WIFI ON");
-                break;
-        }
-    }
 
-	if(curState == 1){
-		dnsServer.processNextRequest();  
+	int switchKey = digitalRead(key1);
+	if (switchKey == LOW) {
+		curState = !curState;
+		delay(500);  // debounce
+	}
+	int switchKey2 = digitalRead(key2);
+	if (switchKey2 == LOW) {
+		listDir(LittleFS, "/", 3);
+		delay(100);
+	}
+	if (curState != lastState) {
+		lastState = curState;
+		switch (curState) {
+			case 0:
+				esp_wifi_stop();
+				Serial.println("WIFI OFF");
+				break;
+			case 1:
+				esp_wifi_start();
+				Serial.println("WIFI ON");
+				break;
+		}
+	}
+
+	if (curState == 1) {
+		dnsServer.processNextRequest();
 		delay(DNS_INTERVAL);
 	}
 
-	if(bleGamepad.isConnected()){     
-  //read from joystick
-uint16_t rawx = analogRead(joystickX);
-uint16_t rawy = analogRead(joystickY);
+	if (bleGamepad.isConnected()) {
+		//read from joystick
+		uint16_t rawx = analogRead(joystickX);
+		uint16_t rawy = analogRead(joystickY);
 
-rawx = constrain(rawx, 750, 3500);
-rawy = constrain(rawy, 750, 3500);
+		rawx = constrain(rawx, 750, 3500);
+		rawy = constrain(rawy, 750, 3500);
 
-// X is inverted (left=4095, right=0), so flip it
-uint16_t mappedX = map(rawx, 3500, 750, 0, 32767); //six seven
-// Y: up=0, down=4095 — joy.cpl wants up=0 so no flip needed
-uint16_t mappedY = map(rawy, 750, 3500, 0, 32767);
+		// X is inverted (left=4095, right=0), so flip it
+		uint16_t mappedX = map(rawx, 3500, 750, 0, 32767);  //six seven
+		// Y: up=0, down=4095 - joy.cpl wants up=0 so no flip needed
+		uint16_t mappedY = map(rawy, 750, 3500, 0, 32767);
 
 
-bleGamepad.setX(mappedX);
-bleGamepad.setY(mappedY);
+		bleGamepad.setX(mappedX);
+		bleGamepad.setY(mappedY);
 
-handleSensor(scaleAB,      cfgSP2, pressB, pressA);
-handleSensor(scaleXY,      cfgSP1, pressX, pressY);
-handleSensor(scaleTrigger, cfgSP3, pressLT, pressRT);
+		handleSensor(scaleAB, cfgSP2, pressB, pressA);
+		handleSensor(scaleXY, cfgSP1, pressX, pressY);
+		handleSensor(scaleTrigger, cfgSP3, pressLT, pressRT);
 	}
 }

@@ -1,0 +1,121 @@
+Plot Report
+-----------
+
+Report Written:     19:49 Sunday, March 22, 2026
+Design Path:        C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Motherboard_v2.pcb
+Design Title:       
+Created:            1/23/2026 1:30:06 PM
+Last Saved:         3/20/2026 4:17:12 PM
+Editing Time:       7558 min
+Units:              mm (precision 2)
+
+
+Device Settings
+===============
+
+
+Gerber Settings
+===============
+
+    Leading zero suppression.
+    G01 assumed throughout.
+    Line termination <*> <CR> <LF>.
+    3.5 format absolute inches.
+    Format commands defined in Gerber file.
+    Aperture table defined in Gerber file.
+    Hardware arcs allowed.
+
+
+Drill Settings
+==============
+
+    Excellon Format 2
+    Format 3.5 absolute in mm.
+    Zero suppression Leading
+
+
+
+Plots Output
+============
+
+    Plot Job: "C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Motherboard_v2.mop"
+
+
+Gerber Output
+=============
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Motherboard_v2 - Outline.gbr
+
+    Layers:
+    ------------------
+    Board Outlines
+
+    D-Code Shape  (thou)
+    -----------------------
+    D10    Round 5.00
+
+Gerber Output
+=============
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Motherboard_v2 - Top Copper.gbr
+
+    Layers:
+    --------------
+    Top Copper
+
+    D-Code Shape  (thou)
+    -----------------------
+    D11    Square 60.00
+    D12    Octagon 60.00
+
+Gerber Output
+=============
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Motherboard_v2 - Bottom Copper.gbr
+
+    Layers:
+    -----------------
+    Bottom Copper
+
+    D-Code Shape  (thou)
+    -----------------------
+    D11    Square 60.00
+    D12    Octagon 60.00
+    D13    Round 50.00
+    D14    Round 78.74
+
+NC Drill Output
+===============
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Motherboard_v2 - Drill Excellon.drl
+
+    Output:
+    ---------------------------
+    Plated Round Drill Holes
+    Plated Slots
+    Plated Board Outlines
+
+    Tool  Size           Count   ID
+    --------------------------------------
+    T001  0.04000 inches 32    F
+    --------------------------------------
+    Total                32
+    --------------------------------------
+
+C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Motherboard_v2 - Drill Excellon (Unplated).drl
+
+    Output:
+    -----------------------------
+    Unplated Round Drill Holes
+    Unplated Slots
+    Unplated Board Outlines
+
+    Tool  Size           Count   ID
+    --------------------------------------
+    T001  0.02500 inches 1
+    --------------------------------------
+    Total                1
+    --------------------------------------
+
+
+End Of Report.

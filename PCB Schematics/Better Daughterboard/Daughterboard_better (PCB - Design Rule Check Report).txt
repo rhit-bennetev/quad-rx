@@ -1,0 +1,74 @@
+Design Rule Check Report
+------------------------
+
+Report Written:     20:33 Tuesday, January 20, 2026
+Design Path:        C:\Users\metcalwh\OneDrive - Rose-Hulman Institute of Technology\Documents\ECE362\Projects\Daughterboard_better.pcb
+Design Title:       
+Created:            1/16/2026 2:17:17 PM
+Last Saved:         1/20/2026 8:28:19 PM
+Editing Time:       3452 min
+Units:              mm (precision 2)
+
+
+Results
+=======
+
+Gap in Net "N0010" between (483.87,478.79) and (481.33,478.79) 
+    N0010.
+
+Gap in Net "N0010" between (481.33,478.79) and (478.79,478.79) 
+    N0010.
+
+
+Number of errors found : 2
+
+
+Settings
+========
+
+
+Spacings
+
+=========
+
+Tracks        Yes
+Pads and Vias Yes
+Shapes        Yes
+Text          Yes
+Board         Yes
+Drills        Yes
+Components    No
+
+
+Manufacturing
+
+==============
+
+Drill Breakout                  No
+Drill Backoff                   No
+Silkscreen Overlap              No
+Copper Text In Board            No
+Min Track Width                 No
+Min Annular Ring                No
+Min Paste Size                  No
+Vias In Pads                    No
+Unplated Vias                   No
+Unplated Pads With Inner Tracks No
+
+
+Nets
+
+=====
+
+Net Completion               Yes
+Dangling Tracks              Yes
+Net Track Length Differences No
+Nets without Components      No
+Nets on No Connect pins      No
+Single Pin Net               No
+Max Vias on Net              No
+Pcb-only Nets                No
+
+
+
+End Of Report.
